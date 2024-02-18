@@ -13,8 +13,10 @@
             fetch(directoryPath)
             .then(response => response.text())
             .then(data => {
-                // Splitting the response by line breaks to get file names
-                const fileNames = data.split('\n');
+                // Extract file names using regular expression
+                const fileNames = data.match(/href="(.*?)"/g)
+                                    .map(match => match.replace('href="', '').replace('"', ''));
+                
                 const fileListElement = document.getElementById('fileList');
                 
                 // Clear previous content
@@ -22,9 +24,19 @@
                 
                 // Loop through file names and add them to the list
                 fileNames.forEach(fileName => {
-                    if (fileName.trim() !== '') { // Exclude empty lines
+                    if (fileName.trim() !== '' && fileName !== '../') { // Exclude empty lines and parent directory link
                         const listItem = document.createElement('li');
-                        listItem.textContent = fileName;
+                        const link = document.createElement('a');
+                        
+                        // Extract the file name without the directory path
+                        const fileNameWithoutPath = fileName.split('/').pop();
+                        
+                        // Construct the correct URL by joining the directory path and the file name
+                        const url = directoryPath + fileNameWithoutPath.replaceAll(' ', '%20');
+                        
+                        link.textContent = fileNameWithoutPath;
+                        link.href = url; // Set the href attribute to the constructed URL
+                        listItem.appendChild(link);
                         fileListElement.appendChild(listItem);
                     }
                 });
@@ -36,7 +48,7 @@
         
         // Call the function with the directory path
         listFilesInDirectory('/mail/south-s/inbox/');
-        </script>
+                </script>
 
 
 
@@ -124,8 +136,8 @@ WebMail: Steven P. South					</h2>
 			<tr>
 				<td><img src="/src/spacer.gif" width=120 height=1></td>
 				<td>
+                    
                     <ul id="fileList"></ul>
-
 					<br>
 					<img src="/src/spacer.gif" width=1 height=40><br>
 					<a href="#top"><div class="backtotop">top of page</div></a><br>

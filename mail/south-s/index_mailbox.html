@@ -1,0 +1,44 @@
+<script>
+    // Function to fetch and display files in a directory
+    function listFilesInDirectory(directoryPath) {
+        fetch(directoryPath)
+        .then(response => response.text())
+        .then(data => {
+            // Extract file names using regular expression
+            const fileNames = data.match(/href="(.*?)"/g)
+                                .map(match => match.replace('href="', '').replace('"', ''));
+            
+            const fileListElement = document.getElementById('fileList');
+            
+            // Clear previous content
+            fileListElement.innerHTML = '';
+            
+            // Loop through file names and add them to the list
+            fileNames.forEach(fileName => {
+                if (fileName.trim() !== '' && fileName !== '../') { // Exclude empty lines and parent directory link
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    
+                    // Extract the file name without the directory path
+                    const fileNameWithoutPath = fileName.split('/').pop();
+                    
+                    // Construct the correct URL by joining the directory path and the file name
+                    const url = directoryPath + fileNameWithoutPath.replaceAll(' ', '%20');
+                    
+                    link.textContent = fileNameWithoutPath;
+                    link.href = url; // Set the href attribute to the constructed URL
+                    listItem.appendChild(link);
+                    fileListElement.appendChild(listItem);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching directory:', error);
+        });
+    }
+    
+    // Call the function with the directory path
+    listFilesInDirectory('/mail/south-s/inbox/');
+            </script>
+
+<ul id="fileList"></ul>
