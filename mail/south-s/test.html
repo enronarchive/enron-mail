@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Directory Listing</title>
+</head>
+<body>
+
+<h2>Files in Directory</h2>
+
+<ul id="fileList"></ul>
+
+<script>
+// Function to fetch and display files in a directory
+function listFilesInDirectory(directoryPath) {
+    fetch('fetchdirectory.php?directory=' + encodeURIComponent(directoryPath)) // Fetch data from PHP script with directory path as query parameter
+    .then(response => response.json()) // Parse JSON response
+    .then(data => {
+        const fileListElement = document.getElementById('fileList');
+        
+        // Clear previous content
+        fileListElement.innerHTML = '';
+        
+        // Loop through file names and add them to the list
+        data.forEach(fileName => {
+            const listItem = document.createElement('li');
+            const textNode = document.createTextNode(fileName); // Create a text node for file name
+            listItem.appendChild(textNode);
+            fileListElement.appendChild(listItem);
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching directory:', error);
+    });
+}
+
+// Call the function to fetch directory listing with the directory path defined in HTML
+listFilesInDirectory('/mail/south-s/inbox');
+</script>
+
+</body>
+</html>

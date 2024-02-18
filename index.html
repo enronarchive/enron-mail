@@ -1,0 +1,98 @@
+<!-- ENRON CORPORATE MAIL V.0.1 -- SEE /CHANGELOG FOR DETAILS-->
+
+<html>
+    
+<head>
+ <title> enron :: corporate email</title>
+
+ <style>
+    a { text-decoration: none; }
+  </style>
+
+</head>
+    
+<body>
+
+<!-- REDIRECTION LOGIC (BASED ON THE INPUT)-->
+    <script src="redirectLogic.js"></script>
+    <script>
+    function handleFormSubmit(event) {
+      event.preventDefault(); // Prevent default form submission
+      
+      var usernameInput = document.getElementById("username").value;
+      var passwordInput = document.getElementById("password").value;
+      
+      // Call the redirectUser function from redirectLogic.js with only the username input
+      var redirectUrl = redirectUser(usernameInput);
+      
+      // Redirect the user to the appropriate page
+      window.location.href = redirectUrl;
+    }
+    </script>
+
+
+    <div align="center">
+
+    <table border="0" width="727" cellspacing="0" cellpadding="0">
+
+    <tr><td colspan=3><img src="/src/topbar.jpg" width="727" height="93" border="0"></td></tr>
+
+    <tr><td valign="top" colspan=3 bgcolor="#ffffff" width="727"><img src="/src/spacer.gif" width="727" height="1"></td></tr>
+
+
+    <tr>
+        <!-- HERO IMAGE, LOOK IN /DEV FOR TEMPLATE.-->
+        <td valign="top" width=484><img src="/src/home_hero.jpg" width=484 height=392></td>
+
+        <td valign="top" bgcolor="#ffffff" width=242>
+            <table cellspacing=0 cellpadding=0 border=0>                
+                <!-- LOGIN AREA -->
+                <tr><td valign="top" style="background: #0066cc">
+                <br>
+                <img src="src/home_existing.png"><br><br>
+                <form id="redirectForm" onsubmit="handleFormSubmit(event)">
+                    <label style="color:#ff9900; font-family: arial;" for="username"><b>Username</b></label><br>
+                    <input type="text" id="username" name="username" required>
+                    <span style="color: white; font-family: arial;">@enron.com</span><br><br>
+                    
+                    <label style="color:#ff9900; font-family: arial;" for="password"><b>Password</b></label><br>
+                    <input type="password" id="password" name="password" required><br><br>
+                    
+                    <input type="image" src="/src/home_login.png" alt="Submit">
+                  </form>
+                </td></tr>
+                <tr><td valign="top" width=242><img src="/src/spacer.gif" width=242 height=1></td></tr>
+                
+                <!-- SIGNUP AREA -->
+                <tr><td valign="top" style="background: #0066cc">
+                    <br>
+                    <img src="src/home_new.png"><br><br>
+                    <a href="mailto:webmailaccess@enroncorp.com"><img src="/src/home_request.png"></a><br><br>
+                    </td></tr>
+                    <tr><td valign="top" width=242><img src="/src/spacer.gif" width=242 height=1></td></tr>    
+
+
+                <!-- LEGAL AND OTHER AREA-->
+                <tr><td valign="top" background="/src/spacer.gif" width=242>
+                <tr><td style="background: #0066cc">
+                <h5 align="center"><br>
+                    <a style="color: white; font-family: arial;" href="legal.html"">Legal Notice |</a>
+                    <a style="color: white; font-family: arial;" href="/changelog"">Changelog |</a>
+                    <a style="color: white; font-family: arial;" href="legal.html"">About</a>
+                </h5>
+                </td>
+            </table>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+
+
+    <tr><td colspan=3><img src="/src/bottombar.gif"></td></tr>
+
+    </table>
+
+    </div>
+</body>
+
+</html>
