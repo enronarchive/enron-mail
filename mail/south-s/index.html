@@ -1,195 +1,83 @@
 <html>
 
 <head>
- <title>Enron: WebMail</title>
- <link rel="stylesheet" href="/src/mail.css" type="text/css">
+	<title>Enron: WebMail</title>
+	<link rel="stylesheet" href="/src/mail.css" type="text/css">
+	<style>
+	.menuimage {
+				cursor: pointer;
+			}
+	a { text-decoration: none; }
+	</style>
 </head>
 
 <body bgcolor="#ffffff">
 
+	<!-- Menu image changer-->
     <script>
-        // Function to fetch and display files in a directory
-        function listFilesInDirectory(directoryPath) {
-            fetch(directoryPath)
-            .then(response => response.text())
-            .then(data => {
-                // Extract file names using regular expression
-                const fileNames = data.match(/href="(.*?)"/g)
-                                    .map(match => match.replace('href="', '').replace('"', ''));
-                
-                const fileListElement = document.getElementById('fileList');
-                
-                // Clear previous content
-                fileListElement.innerHTML = '';
-                
-                // Loop through file names and add them to the list
-                fileNames.forEach(fileName => {
-                    if (fileName.trim() !== '' && fileName !== '../') { // Exclude empty lines and parent directory link
-                        const listItem = document.createElement('li');
-                        const link = document.createElement('a');
-                        
-                        // Extract the file name without the directory path
-                        const fileNameWithoutPath = fileName.split('/').pop();
-                        
-                        // Construct the correct URL by joining the directory path and the file name
-                        const url = directoryPath + fileNameWithoutPath.replaceAll(' ', '%20');
-                        
-                        link.textContent = fileNameWithoutPath;
-                        link.href = url; // Set the href attribute to the constructed URL
-                        listItem.appendChild(link);
-                        fileListElement.appendChild(listItem);
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching directory:', error);
-            });
+        function changeImage(newSrc, imgId) {
+            document.getElementById(imgId).src = newSrc;
         }
-        
-        // Call the function with the directory path
-        listFilesInDirectory('/mail/south-s/inbox/');
-                </script>
-
-
-
-
-
-<a name="top">
+    </script>
 
 <div align="center">
 
-<!-- Six-column layout... each column is 120 px wide with seven 1-px pinstripes separating -->
-
 <table border="0" width="727" cellspacing="0" cellpadding="0">
 
-<tr><td colspan="13"><img src="/src/topbar.jpg" width="727" height="93" border="0" usemap="#topbar_map"></td></tr>
-
-<!-- bread crumb stripe -->
+<tr><td colspan="13"><img src="/src/topbar.jpg" width="727" height="93" border="0"></td></tr>
 <tr>
-	<td colspan="13" bgcolor="#0066cc">
-		<img src="/src/spacer.gif" width="10" height="1">
-		<b class="crumblink">You are here:</b>&nbsp;&nbsp;<nobr><a href="/index.html" class="crumblink">&gt;&gt; Enron WebMail</a></nobr>&nbsp;&nbsp;<nobr><a href="/mail/south-s/" class="crumblink">&gt;&gt;<b> Steven P. South</b></a></nobr>&nbsp;&nbsp;<nobr>
-	</td>
-</tr>
-
-<!-- top horizontal pinstripe -->
-<tr>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="120" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="120" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="120" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="120" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="120" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="120" height="1" alt="spacer"/></td>
-	<td valign="top" class="gridLine" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt="spacer"/></td>
-</tr>
-
-<!-- makes left blue pinstripe contiguous but creates break between navbar and bread crumb bar -->
-<tr><td colspan="1" bgcolor="#0066cc" width="1"><img src="/src/spacer.gif" width="1" height="1"></td><td colspan="12" bgcolor="#ffffff" width="726"><img src="/src/spacer.gif" width="726" height="1"></td></tr>
-
-<!-- column indicators, remove for production -->
-<!--
-<tr>
-        <td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc"><br /></td>
-		<td valign="top"></td>
-        <td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc"><br /></td>
-		<td valign="top"></td>
-        <td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc"><br /></td>
-		<td valign="top"></td>
-        <td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc"><br /></td>
-		<td valign="top"></td>
-        <td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc"><br /></td>
-		<td valign="top"></td>
-        <td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc"><br /></td>
-		<td valign="top"></td>
-        <td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc"><br /></td>
-</tr>
--->
-
-<tr>
-	<!-- left edge, vertical pinstripe -->
 	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan=2><br /></td>
+	<td valign="top" colspan=10 rowspan=2>
 
-	<!-- page content is columns 1,2,3,4,5 -->
-	<td valign="top" colspan=9 rowspan=2>
-
-		<!-- above-the-title section navigation, if any -->
+		<!-- Title and Menu -->
 		<table cellspacing=0 cellpadding=0 border=0 width=604>
 			<tr>
 				<td width=13><img src="/src/spacer.gif" width=13 height=1></td>
 				<td>
-<img src="/src/spacer.gif" width=1 height=10><br>					<h2>
-WebMail: Steven P. South					</h2>
-					<!-- </b></font> -->
+				<img src="/src/spacer.gif" width=1 height=10><br>
+				<!--Title-->
+				<h2>WebMail: Steven P. South</h2>
+				<!--Menu-->
+				<nobr>
+						<img id="back" class="menuimage" src="/src/back_off.jpg" onclick="history.back()" onmouseover="changeImage('/src/back_on.jpg', 'back')" onmouseout="changeImage('/src/back_off.jpg', 'back')" alt="Back">	
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="new.html">
+							<img id="new" class="menuimage" src="/src/compose_off.jpg" onmouseover="changeImage('/src/compose_hover.jpg', 'new')" onmouseout="changeImage('/src/compose_off.jpg', 'new')" alt="Compose">
+						</a>
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="index.html">
+							<img id="inbox" class="menuimage" src="/src/inbox_on.jpg" onmouseover="changeImage('/src/inbox_on.jpg', 'inbox')" onmouseout="changeImage('/src/inbox_on.jpg', 'inbox')" alt="Inbox">
+						</a>
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="/help.html">
+							<img id="help" class="menuimage" src="/src/help_off.jpg" onmouseover="changeImage('/src/help_hover.jpg', 'help')" onmouseout="changeImage('/src/help_off.jpg', 'help')" alt="Get help">
+						</a>
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="/index.html">
+							<img id="exit" class="menuimage" src="/src/exit_off.jpg" onmouseover="changeImage('/src/exit_hover.jpg', 'exit')" onmouseout="changeImage('/src/exit_off.jpg', 'exit')" alt="Log Off">
+					</nobr>
+					<br><br>
+				<iframe src="south-s.html" width="700" height="700"></iframe>
 				</td>
 			</tr>
 		</table>
 		<!-- <p> -->
-
-		<!-- copy spans columns 2,3,4 -->
-		<table cellspacing=0 cellpadding=0 border=0 width=483>
-			<tr>
-				<td><img src="/src/spacer.gif" width=120 height=1></td>
-				<td>
-                    
-                    <ul id="fileList"></ul>
-					<br>
-					<img src="/src/spacer.gif" width=1 height=40><br>
-					<a href="#top"><div class="backtotop">top of page</div></a><br>
-					<img src="/src/spacer.gif" width=1 height=25>
-				</td>
-			</tr>
-		</table>
 	</td>
-
 	<!-- pinstripe separating page content from "see also" column -->
 	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan=2><br /></td>
 
 	<!-- column 6: navbar or "see also" or whatever -->
-	<td valign="top" bgcolor="#0066cc">
-		<table cellspacing=0 cellpadding=0 border=0 width=120>
-            <!-- <tr><td bgcolor="#ffffff" colspan=3><img src="/src/spacer.gif" width=120 height=1></td></tr>   -->
-			<tr>
-				<td><img src="/src/spacer.gif" width=10 height=1></td>
-				<td valign="top">
-					<img src="/src/spacer.gif" width=1 height=10><br>
-
-<!-- menu -->
-<div class=navitems>Actions<br></div>
-<div class=navitems><a class='navlink' href='/corp/pressroom/factsheets/company'>Compose Email</a><br></div>
-<div class=navitems><a href="/corp/investors/annuals/2000/" class=navlink>Annual Report</a><br></div>
-<div class=navitems><a href="/corp/products/" class=navlink>Products+Services</a><br></div>
-<div class=navitems><a href="/corp/contacts/" class=navlink>Contact us</a><br></div>
-<img src=/src/spacer.gif width=1  height=10><br>
-<img src=/src/img/pixels/555.gif width=90 height=1><br>
-<img src=/src/spacer.gif width=1  height=15><br>
-<div class=navitems><a href="/corp" class=navlink>back to enron.com</a><br></div>
-<!-- end of menu -->
-
-				</td>
-				<td><img src="/src/spacer.gif" width=5 height=1></td>
-			</tr>
-		</table>
-	</td>
+	
 
 	<!-- pinstripe at right edge of page -->
 	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan=2><br /></td>
 </tr>
 
 
-<!-- for column 6 only, to get the navimage to stick to the bottom -->
-<tr><td valign="bottom" bgcolor="#0066cc"><img src="/src/img/corp/enron_navimage.gif"></td></tr>
-
-
 <!-- bottom pinstripe -->
 <tr><td valign="top" class="gridLine" bgcolor="#0066cc" colspan="13"><img src="/src/spacer.gif" width="1" height="1" alt="spacer" /></td></tr>
 
-<tr><td colspan=13><img src="/src/img/corp/enron_bottombar.gif"></td></tr>
+<tr><td colspan=13><img src="/src/bottombar.gif"></td></tr>
 
 </table>
 
