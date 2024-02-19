@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<title>Enron WebMail: Mailbox</title>
+	<title>Enron WebMail: Compose</title>
 	<link rel="stylesheet" href="/src/mail.css" type="text/css">
 	<style>
 	.menuimage {
@@ -42,11 +42,11 @@
 						<img id="back" class="menuimage" src="/src/back_off.jpg" onclick="history.back()" onmouseover="changeImage('/src/back_on.jpg', 'back')" onmouseout="changeImage('/src/back_off.jpg', 'back')" alt="Back">	
 						<img src="/src/spacer.gif" width="5" height="33">
 						<a href="new.html">
-							<img id="new" class="menuimage" src="/src/compose_off.jpg" onmouseover="changeImage('/src/compose_hover.jpg', 'new')" onmouseout="changeImage('/src/compose_off.jpg', 'new')" alt="Compose">
+							<img id="new" class="menuimage" src="/src/compose_on.jpg" onmouseover="changeImage('/src/compose_hover.jpg', 'new')" onmouseout="changeImage('/src/compose_on.jpg', 'new')" alt="Compose">
 						</a>
 						<img src="/src/spacer.gif" width="5" height="33">
 						<a href="index.html">
-							<img id="inbox" class="menuimage" src="/src/inbox_on.jpg" onmouseover="changeImage('/src/inbox_on.jpg', 'inbox')" onmouseout="changeImage('/src/inbox_on.jpg', 'inbox')" alt="Inbox">
+							<img id="inbox" class="menuimage" src="/src/inbox_off.jpg" onmouseover="changeImage('/src/inbox_on.jpg', 'inbox')" onmouseout="changeImage('/src/inbox_off.jpg', 'inbox')" alt="Inbox">
 						</a>
 						<img src="/src/spacer.gif" width="5" height="33">
 						<a href="/help.html">
@@ -57,12 +57,40 @@
 							<img id="exit" class="menuimage" src="/src/exit_off.jpg" onmouseover="changeImage('/src/exit_hover.jpg', 'exit')" onmouseout="changeImage('/src/exit_off.jpg', 'exit')" alt="Log Off">
 					</nobr>
 					<br><br>
-					<img src="/src/024.gif" width="700" height="1"><br><br>
-				<iframe src="south-s.html" width="700" height="1000"></iframe>
+                    <img src="/src/024.gif" width="700" height="1"><br><br>
+
+				
+				</td>
+			</tr>
+            
+		</table>
+	
+        <table cellspacing=0 cellpadding=0 border=0 width=483>
+			<tr>
+				<td><img src="/src/img/ui/spacer.gif" width=10 height=1></td>
+				<td>
+<!-- CONTENT GOES HERE-->        
+<br><h2 align="center" style="color: #0066cc";">Compose New Email</h2><br>
+    
+<form form name="email" method="POST" action="/email_sent.html" netlify>
+    <nobr><label for="email"><b style="color: #0066cc;">To: </b></label> <input type="email" id="email" name="email" required size="23">
+    <label for="email"><b style="color: #0066cc;">CC: </b></label> <input type="email" id="email" name="email" size="23">
+    <label for="email"><b style="color: #0066cc;">BCC: </b></label> <input type="email" id="email" name="email" size="23"></nobr><br><br>
+    <nobr><label for="subject"><b style="color: #0066cc;">Subject: </b></label><input type="text" id="subject" name="subject" required size="30">
+    <label for="file"><b style="color: #0066cc;">Attachment: </b></label></nobr>
+    <input type="file" id="myfile" name="myfile" size="86">
+    <br><br>
+    <label for="message"><b style="color: #0066cc;">Type your message here: </b></label><br>
+    <textarea id="message" name="message" rows="10" cols="91" required></textarea><br><br>
+
+    <div align="center"><input type="image" src="/src/sendemail.png" alt="Submit"></div>
+</form>
 				</td>
 			</tr>
 		</table>
-		<!-- <p> -->
+	</td>
+
+        
 	</td>
 	<!-- pinstripe separating page content from "see also" column -->
 	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan=2><br /></td>
