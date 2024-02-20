@@ -12,7 +12,7 @@
 <body>
 
 <!-- REDIRECTION LOGIC (BASED ON THE INPUT)-->
-    <script src="/src/redirectLogic.js"></script>
+    <script src="redirectLogic.js"></script>
     <script>
     function handleFormSubmit(event) {
       event.preventDefault(); // Prevent default form submission
@@ -40,32 +40,32 @@
 
     <tr>
         <!-- HERO IMAGE, LOOK IN /DEV FOR TEMPLATE.-->
-        <td valign="top" width=484><img src="/src/home_hero.jpg" width=484 height=392></td>
-
+        <td valign="top" width=484><img src="/src/home_hero.jpg" width=484 height=374></td>
         <td valign="top" bgcolor="#ffffff" width=242>
             <table cellspacing=0 cellpadding=0 border=0>                
                 <!-- LOGIN AREA -->
                 <tr><td valign="top" style="background: #0066cc">
                 <br>
-                <img src="src/home_existing.png"><br><br>
+                <div align="center"><img src="src/home_existing.png"><br><br>
                 <form id="redirectForm" onsubmit="handleFormSubmit(event)">
                     <label style="color:#ff9900; font-family: arial;" for="username"><b>Username</b></label><br>
-                    <input type="text" id="username" name="username" required>
-                    <span style="color: white; font-family: arial;">@enron.com</span><br><br>
+                    <nobr><input type="text" id="username" name="username" required size="10">
+                    <span style="color: white; font-family: arial;">@enron.com</span><br><br></nobr>
                     
                     <label style="color:#ff9900; font-family: arial;" for="password"><b>Password</b></label><br>
-                    <input type="password" id="password" name="password" required><br><br>
+                    <input type="password" id="password" name="password" required size="25"><br><br>
                     
-                    <input type="image" src="/src/home_login.png" alt="Submit">
+                    <input type="image" src="/src/home_login.png" alt="Submit"></div>
                   </form>
                 </td></tr>
                 <tr><td valign="top" width=242><img src="/src/spacer.gif" width=242 height=1></td></tr>
                 
                 <!-- SIGNUP AREA -->
                 <tr><td valign="top" style="background: #0066cc">
+                    <div align="center">
                     <br>
                     <img src="src/home_new.png"><br><br>
-                    <a href="mailto:webmailaccess@enroncorp.com"><img src="/src/home_request.png"></a><br><br>
+                    <a href="mailto:webmailaccess@enroncorp.com"><img src="/src/home_request.png"></a><br><br></div>
                     </td></tr>
                     <tr><td valign="top" width=242><img src="/src/spacer.gif" width=242 height=1></td></tr>    
 
@@ -77,6 +77,7 @@
                     <a style="color: white; font-family: arial;" href="legal.html"">Legal Notice |</a>
                     <a style="color: white; font-family: arial;" href="/dev/changelog/"">Changelog |</a>
                     <a style="color: white; font-family: arial;" href="http://archive.enroncorp.com"">About</a>
+                    
                 </h5>
                 </td>
             </table>

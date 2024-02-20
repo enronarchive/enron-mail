@@ -1,9 +1,11 @@
 <style type="text/css">
 body {
-    font-family: Arial Unicode MS, Palatino, Sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 a {
-        color: #ff8000;
+        color: #ff9900;
+        font-weight: bold;
+        font-family: Arial, Helvetica, sans-serif;
 }
 hr {
   border-color: #0066cc;
@@ -17,57 +19,66 @@ hr {
 }
 #empty_cell {
   width:100%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #from_row {
 }
 header_row_odd {
   background-color: white;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #to_row {
 }
 header_row_even {
   background-color: white;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #cc_row {
-
+  font-family: Arial, Helvetica, sans-serif;
 }
 #bcc_row {
-
+  font-family: Arial, Helvetica, sans-serif;
 }
 #date_row {
-
+  font-family: Arial, Helvetica, sans-serif;
 }
 #subject_row {
-
+  font-family: Arial, Helvetica, sans-serif;
 }
 #attach_row {
-
+  font-family: Arial, Helvetica, sans-serif;
 }
 #rfcheaders_row {
-
+  font-family: Arial, Helvetica, sans-serif;
 }
 #from_caption, #to_caption, #cc_caption, #bcc_caption, #date_caption, #subject_caption, #attach_caption, #rfcheaders_caption {
+  font-weight: bolder;
   color: #0066cc;
   text-align: right;
   padding-right:16px;
   padding-left:16px;
   vertical-align: text-top;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #from_text, #to_text, #cc_text, #bcc_text, #date_text, #subject_text, #rfcheaders_text {
   -space: nowrap;
   width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #attach_text {
   width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #msg_body {
   border-style:none;
   word-wrap:break-word;
   padding: 8px 8px 8px 8px;
   transform: scale(1);
+  font-family: Arial, Helvetica, sans-serif;
 }
 #attach_table {
   border-style:none;
   background-color: white;
   -space: nowrap;
+  font-family: Arial, Helvetica, sans-serif;
 }
