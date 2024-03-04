@@ -33,7 +33,15 @@ function redirectUser(input) {
 
         case "hendrickson-s":
           redirectUrl = "/mail/hendrickson-s/";
-          break;  
+          break;
+          
+        case "king-j":
+          redirectUrl = "/mail/king-j/";
+          break;
+
+        case "bailey-s":
+          redirectUrl = "/mail/bailey-s/";
+          break;
 
       // Add more cases for other pages as needed
       default:
