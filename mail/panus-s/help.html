@@ -1,0 +1,118 @@
+<html>
+
+<head>
+	<title>Enron WebMail: Help</title>
+	<link rel="stylesheet" href="/src/mail.css" type="text/css">
+	<style>
+	.menuimage {
+				cursor: pointer;
+			}
+	a { text-decoration: none; }
+	</style>
+</head>
+
+<body bgcolor="#ffffff">
+
+	<!-- Menu image changer-->
+    <script>
+        function changeImage(newSrc, imgId) {
+            document.getElementById(imgId).src = newSrc;
+        }
+    </script>
+
+<div align="center">
+
+<table border="0" width="727" cellspacing="0" cellpadding="0">
+
+<tr><td colspan="13"><img src="/src/topbar.jpg" width="727" height="93" border="0"></td></tr>
+<tr>
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan=2><br /></td>
+	<td valign="top" colspan=10 rowspan=2>
+
+		<!-- Title and Menu -->
+		<table cellspacing=0 cellpadding=0 border=0 width=604>
+			<tr>
+				<td width=13><img src="/src/spacer.gif" width=13 height=1></td>
+				<td>
+				<img src="/src/spacer.gif" width=1 height=10><br>
+				<!--Title-->
+				<h2>WebMail: Stephanie Panus</h2>
+				<!--Menu-->
+				<nobr>
+						<img id="back" class="menuimage" src="/src/back_off.jpg" onclick="history.back()" onmouseover="changeImage('/src/back_on.jpg', 'back')" onmouseout="changeImage('/src/back_off.jpg', 'back')" alt="Back">	
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="new.html">
+							<img id="new" class="menuimage" src="/src/compose_off.jpg" onmouseover="changeImage('/src/compose_hover.jpg', 'new')" onmouseout="changeImage('/src/compose_off.jpg', 'new')" alt="Compose">
+						</a>
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="index.html">
+							<img id="inbox" class="menuimage" src="/src/inbox_off.jpg" onmouseover="changeImage('/src/inbox_hover.jpg', 'inbox')" onmouseout="changeImage('/src/inbox_off.jpg', 'inbox')" alt="Inbox">
+						</a>
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="help.html">
+							<img id="help" class="menuimage" src="/src/help_on.jpg" onmouseover="changeImage('/src/help_hover.jpg', 'help')" onmouseout="changeImage('/src/help_on.jpg', 'help')" alt="Get help">
+						</a>
+						<img src="/src/spacer.gif" width="5" height="33">
+						<a href="/index.html">
+							<img id="exit" class="menuimage" src="/src/exit_off.jpg" onmouseover="changeImage('/src/exit_hover.jpg', 'exit')" onmouseout="changeImage('/src/exit_off.jpg', 'exit')" alt="Log Off">
+					</nobr>
+					<br><br>
+                    <img src="/src/024.gif" width="700" height="1"><br><br>
+
+				
+				</td>
+			</tr>
+            
+		</table>
+	
+        <table cellspacing=0 cellpadding=0 border=0 width=483>
+			<tr>
+				<td><img src="/src/img/ui/spacer.gif" width=10 height=1></td>
+				<td>
+<!-- CONTENT GOES HERE-->        
+<br><h2 align="center" style="color: #0066cc";">WebMail Help</h2><br>
+    
+<p align="center">This WebMail application is in beta. We value all of your feedback as we work to improve the application. You can leave your feedback or raise any issues using the form below. You can include images as an attachment to show any errors you may be having.</p><br>
+
+<form form name="help" method="POST" action="helpsent.html" netlify>
+    <nobr><label for="subject"><b style="color: #0066cc;">Name: </b></label><input type="text" id="subject" name="subject" required size="5">
+
+    <label for="type"><b style="color: #0066cc;">Select Type: </b></label>
+    <select id="type" name="type">
+      <option value="feedback">Feedback</option>
+      <option value="DMCA">DMCA Request</option>
+      <option value="help">Application Support</option>
+      <option value="deploy">Deployment Support</option>
+    </select>
+    <label for="file"><b style="color: #0066cc;">Attachment: </b></label>
+    <input type="file" id="myfile" name="myfile" size="10">
+</nobr>
+    <br><br>
+    <label for="message"><b style="color: #0066cc;">Type your message here: </b></label><br>
+    <textarea id="message" name="message" rows="10" cols="91" required></textarea><br><br>
+
+    <div align="center"><input type="image" src="/src/sendemail.png" alt="Submit"></div>
+</form>
+				</td>
+			</tr>
+		</table>
+	</td>
+
+        
+	</td>
+	<!-- pinstripe separating page content from "see also" column -->
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan=1><br /></td>
+</tr>
+
+
+<!-- bottom pinstripe -->
+<tr><td valign="top" class="gridLine" bgcolor="#0066cc" colspan="13"><img src="/src/spacer.gif" width="1" height="1" alt="spacer" /></td></tr>
+
+<tr><td colspan=13><img src="/src/bottombar.gif"></td></tr>
+
+</table>
+
+</div>
+
+</body>
+</html>

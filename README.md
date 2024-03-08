@@ -32,6 +32,7 @@ Check the "redirectLogic.js" file at root for an updated list of all avaliable a
 - hendrickson-s
 - king-j
 - bailey-s
+- panus-s
 
 ## About the Enron Archive
 
