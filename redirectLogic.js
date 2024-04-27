@@ -3,6 +3,7 @@ function redirectUser(input) {
     
     var redirectUrl;
     switch(userInput) {
+
       case "south-s":
         redirectUrl = "/mail/south-s";
         break;
@@ -47,7 +48,14 @@ function redirectUser(input) {
           redirectUrl = "/mail/panus-s/";
           break;
 
-      // Add more cases for other pages as needed
+        case "sanchez-m":
+          redirectUrl = "/mail/sanchez-m/";
+          break;
+          
+        case "townsend-j":
+          redirectUrl = "/mail/townsend-j/";
+          break;  
+
       default:
         redirectUrl = "index.html";
         break;
