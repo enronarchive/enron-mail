@@ -230,7 +230,7 @@ class MailboxApp {
     
     async loadMailboxData() {
         // Try to load index.json first
-        const indexResponse = await fetch(`${this.mailboxName}/index.json`);
+        const indexResponse = await fetch(`/mail/${this.mailboxName}/index.json`);
         if (!indexResponse.ok) {
             throw new Error(`Failed to load mailbox data (HTTP ${indexResponse.status}). Please check that the mailbox exists.`);
         }
@@ -256,7 +256,7 @@ class MailboxApp {
         const loadPromises = [];
         for (let i = 2; i <= totalParts; i++) {
             loadPromises.push(
-                fetch(`${this.mailboxName}/index-part-${i}.json`)
+                fetch(`/mail/${this.mailboxName}/index-part-${i}.json`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}`);
