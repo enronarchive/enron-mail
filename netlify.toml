@@ -1,7 +1,7 @@
 [[redirects]]
   from = "/mail/:mailbox/attachments/*"
   to = "https://huggingface.co/datasets/enronarchive/mail/resolve/main/mail/:mailbox/attachments/:splat"
-  status = 200
+  status = 301
   force = true
 
 # Optional: Add headers for better caching
