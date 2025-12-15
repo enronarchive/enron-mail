@@ -935,7 +935,7 @@ class MailboxApp {
             return `
                 <div class="attachment-item">
                     <span class="attachment-icon">${icon}</span>
-                    <a href="${path}" download="${name}">${name}</a>
+                    <a href="${path}" target="_blank">${name}</a>
                 </div>
             `;
         });
