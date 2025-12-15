@@ -1,0 +1,17 @@
+# Development files and backups
+dev/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Email attachments (stored in HuggingFace dataset)
+mail/*/attachments/

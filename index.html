@@ -8,6 +8,41 @@
         <!-- this script handles the login logic-->
             <script src="redirectLogic.js"> //see this file for a list of valid logins</script>
             <script>
+            // Check if user is already logged in
+            window.addEventListener('DOMContentLoaded', function() {
+                // Check if navigating to search
+                if (sessionStorage.getItem('navigating_to_search') === 'true') {
+                    sessionStorage.removeItem('navigating_to_search');
+                    return; // Don't redirect
+                }
+                
+                // Check for logout flag first
+                if (sessionStorage.getItem('logging_out') === 'true') {
+                    sessionStorage.removeItem('logging_out');
+                    localStorage.removeItem('enron_current_mailbox');
+                    return; // Don't redirect
+                }
+                
+                // Don't auto-redirect if coming from search
+                if (sessionStorage.getItem('from_search') === 'true') {
+                    sessionStorage.removeItem('from_search');
+                    return;
+                }
+                
+                // Don't redirect if going directly to mailbox from search
+                if (sessionStorage.getItem('from_search_direct') === 'true') {
+                    sessionStorage.removeItem('from_search_direct');
+                    return;
+                }
+                
+                var currentMailbox = localStorage.getItem('enron_current_mailbox');
+                // Only redirect if we have a mailbox AND we're arriving from a redirect (not manually)
+                if (currentMailbox && document.referrer && !document.referrer.includes('/index.html')) {
+                    // User is already logged in, redirect to mailbox
+                    window.location.href = '/mail/index.html';
+                }
+            });
+            
             function handleFormSubmit(event) {
             event.preventDefault(); // Prevent default form submission
             
@@ -84,10 +119,10 @@
                         <tr>
                             <td valign="top" background="/src/blue.gif" width=242 height="60">
                                 <h5 align="center"><br>
+                                    <a style="color: white; font-family: arial;" href="search.html" onclick="event.preventDefault(); sessionStorage.setItem('navigating_to_search', 'true'); window.location.href='search.html';">Search |</a>
                                     <a style="color: white; font-family: arial;" href="legal.html"">Legal Notice |</a>
-                                    <a style="color: white; font-family: arial;" href="/dev/changelog/"">Changelog |</a>
+                                    <a style="color: white; font-family: arial;" href="changelog.html"">Changelog |</a>
                                     <a style="color: white; font-family: arial;" href="http://archive.enroncorp.com"">About</a>
-                                    
                                 </h5>
                             
                             </td>

@@ -1,7 +1,5 @@
 /* Netscape for Windows styles */
 
-<style type: "text/css">
-
 body { background-color: #ffffff }
 
 /* NAVBAR STYLES */
@@ -67,3 +65,87 @@ b { font-weight: bold }
 /* PERSONIC TWEAKS */
 
 .smalltextarea { font-size: 11px; font-family: verdana,arial,helvetica,geneva,sans-serif }
+
+/* Email toolbar layout fixes */
+.email-toolbar { display: flex; gap: 2px; align-items: center; flex-wrap: nowrap; justify-content: flex-start; }
+.email-toolbar .menuimage { 
+	display: block; 
+	transform: scale(0.8); /* 80% of original size */
+	transform-origin: center; 
+}
+
+/* Loading spinner styles */
+.loading-container {
+	text-align: center;
+	padding: 40px;
+	color: #666;
+}
+
+.loading-message {
+	font-size: 14px;
+	margin-bottom: 10px;
+}
+
+.loading-spinner {
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid #0066cc;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	animation: spin 1s linear infinite;
+	margin: 0 auto;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+/* Star column */
+.email-star {
+	width: 30px;
+	text-align: center;
+	cursor: pointer;
+	user-select: none;
+}
+
+.star-icon {
+	font-size: 16px;
+	color: #ccc;
+	transition: color 0.2s;
+}
+
+.star-icon.starred {
+	color: #ff9900;
+}
+
+.email-star:hover .star-icon:not(.starred) {
+	color: #ffcc66;
+}
+
+/* Read/Unread emails */
+.email-row.unread {
+	font-weight: bold;
+	background-color: #f0f8ff;
+}
+
+.email-row.unread:hover {
+	background-color: #e6f2ff;
+}
+
+/* Keyboard selection */
+.email-row.selected {
+	background-color: #fff3cd !important;
+	outline: 2px solid #ffc107;
+}
+
+/* Search results info */
+.search-results-info {
+	background-color: #e8f4f8;
+	border: 1px solid #b8d4e8;
+	padding: 8px 12px;
+	margin-bottom: 10px;
+	border-radius: 3px;
+	font-size: 11px;
+	color: #333;
+}

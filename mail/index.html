@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Enron WebMail: Mailbox</title>
+	<link rel="stylesheet" href="/src/mail.css" type="text/css">
+	<style>
+	.menuimage {
+		cursor: pointer;
+	}
+	
+	/* Email list table */
+	.email-list {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 10px;
+	}
+	.email-list th {
+		background-color: #0066cc;
+		color: #ff9900;
+		font-weight: bold;
+		padding: 8px;
+		text-align: left;
+		border: 1px solid #0066cc;
+		font-size: 10pt;
+	}
+	.email-row {
+		border-bottom: 1px solid #e0e0e0;
+		cursor: pointer;
+		background-color: #fff;
+	}
+	.email-row:hover {
+		background-color: #f8f8f8;
+	}
+	.email-row.unread {
+		font-weight: bold;
+	}
+	.email-row td {
+		padding: 6px 8px;
+		font-size: 11px;
+		border-left: 1px solid #e0e0e0;
+		border-right: 1px solid #e0e0e0;
+	}
+	.email-from {
+		width: 20%;
+		color: #333;
+		word-break: break-word;
+		overflow-wrap: break-word;
+		max-width: 20%;
+	}
+	.email-subject {
+		width: 60%;
+		color: #0066cc;
+	}
+	.email-date {
+		width: 25%;
+		color: #666;
+		text-align: right;
+	}
+	.email-attachment {
+		display: none;
+	}
+	.attachment-icon {
+		color: #ff9900;
+	}
+	
+	/* Responsive container */
+	.page-container {
+		max-width: 727px;
+		width: 100%;
+		margin: 0 auto;
+	}
+	.page-container table {
+		width: 100%;
+	}
+	.page-container img {
+		max-width: 100%;
+		height: auto;
+	}
+	
+	/* Responsive layout adjustments */
+	@media (max-width: 768px) {
+		.sidebar-menu-item,
+		.folder-item {
+			font-size: 12px;
+			padding: 8px;
+		}
+		.email-list th,
+		.email-list td {
+			font-size: 10px;
+			padding: 4px;
+		}
+		.email-from,
+		.email-date {
+			display: none;
+		}
+		.email-subject {
+			width: 90%;
+		}
+	}
+	
+	/* Sidebar menu and folder styles */
+	.sidebar-content {
+		max-width: 180px;
+		overflow: hidden;
+		word-wrap: break-word;
+	}
+	.sidebar-menu {
+		margin-bottom: 15px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #ff9900;
+	}
+	.sidebar-menu-item,
+	.folder-item {
+		display: block;
+		padding: 6px 8px;
+		margin: 3px 0;
+		cursor: pointer;
+		font-size: 10px;
+		color: white;
+		text-decoration: none;
+		white-space: normal;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+	.sidebar-menu-item:hover,
+	.folder-item:hover {
+		background-color: #ff9900;
+	}
+	.sidebar-menu-item.disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.sidebar-menu-item.disabled:hover {
+		background-color: transparent;
+	}
+	.folder-item.active {
+		background-color: #ff9900;
+		font-weight: bold;
+	}
+	.folder-name {
+		display: inline;
+	}
+	.folder-count {
+		float: right;
+		color: #ccddff;
+		font-size: 9px;
+	}
+	
+	/* Search box */
+	.search-box {
+		width: 100%;
+		padding: 8px;
+		border: 2px solid #0066cc;
+		border-radius: 4px;
+		font-size: 12px;
+		margin-bottom: 15px;
+		box-sizing: border-box;
+	}
+	
+	/* Search highlight in email body */
+	.search-highlight {
+		background-color: #ff9900;
+		color: #000;
+		padding: 2px 0;
+		font-weight: bold;
+	}
+	
+	/* Loading and error messages */
+	.loading {
+		text-align: center;
+		padding: 40px;
+		color: white;
+		font-size: 11px;
+	}
+	.no-results {
+		text-align: center;
+		padding: 40px;
+		color: #666;
+		font-style: italic;
+	}
+	
+	/* Pagination */
+	.pagination {
+		text-align: center;
+		padding: 15px;
+		margin-top: 10px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+	}
+	.pagination-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		flex-wrap: nowrap;
+	}
+	.pagination a {
+		text-decoration: none;
+		border: none;
+		outline: none;
+		display: inline-flex;
+		align-items: center;
+		line-height: 0;
+		flex-shrink: 0;
+	}
+	.pagination a img {
+		display: block;
+		border: none;
+	}
+	.pagination button {
+		background-color: #0066cc;
+		color: white;
+		border: none;
+		padding: 8px 15px;
+		margin: 0 5px;
+		cursor: pointer;
+		border-radius: 3px;
+		font-size: 11px;
+	}
+	.pagination button:hover {
+		background-color: #004499;
+	}
+	.pagination button:disabled {
+		background-color: #ccc;
+		cursor: not-allowed;
+	}
+	.pagination .page-info {
+		display: inline-flex;
+		align-items: center;
+		margin: 0 10px;
+		font-size: 11px;
+		color: #666;
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+	
+	/* Inline email detail view */
+	#email-detail {
+		display: none;
+		margin-top: 20px;
+	}
+	#email-detail.visible {
+		display: block;
+	}
+	.email-toolbar .menuimage {
+		vertical-align: middle;
+	}
+	.email-toolbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
+	}
+	.email-toolbar img[alt="Permalink"] {
+		/* reserved for future enabled state */
+	}
+	.email-headers {
+		background-color: #f5f5f5;
+		border: 1px solid #ccc;
+		padding: 15px;
+		margin: 15px 0;
+	}
+	.email-headers table {
+		width: 100%;
+		font-size: 11px;
+	}
+	.email-headers td {
+		padding: 4px;
+		vertical-align: top;
+	}
+	.email-headers td:first-child {
+		font-weight: bold;
+		color: #0066cc;
+		width: 80px;
+	}
+	.email-from-value {
+		font-weight: bold;
+		color: #ff9900;
+	}
+	.email-subject-value {
+		font-weight: bold;
+		color: #ff9900;
+	}
+	.collapsible-list {
+		margin: 0;
+		padding: 0;
+	}
+	.collapsible-toggle {
+		color: #0066cc;
+		cursor: pointer;
+		text-decoration: underline;
+		font-size: 11px;
+		display: block;
+		margin-top: 8px;
+		clear: both;
+	}
+	.collapsible-toggle:hover {
+		color: #ff9900;
+	}
+	.collapsible-content {
+		display: none;
+		margin-top: 5px;
+	}
+	.collapsible-content.expanded {
+		display: block;
+	}
+	.attachment-item {
+		display: inline-flex;
+		align-items: center;
+		margin: 3px 5px 3px 0;
+		padding: 4px 8px;
+		background-color: #0066cc;
+		border: 1px solid #0066cc;
+		border-radius: 3px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+	.attachment-item:hover {
+		background-color: #ff9900;
+		border-color: #ff9900;
+	}
+	.attachment-item a {
+		color: white;
+		text-decoration: none;
+		font-size: 11px;
+	}
+	.attachment-item:hover a {
+		color: #0066cc;
+	}
+	.attachment-icon {
+		width: auto;
+		height: auto;
+		margin-right: 6px;
+		display: inline-block;
+		font-size: 9px;
+		font-weight: bold;
+		color: white;
+		background-color: rgba(255, 255, 255, 0.2);
+		padding: 2px 4px;
+		border-radius: 2px;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		font-family: monospace;
+	}
+	.attachment-item:hover .attachment-icon {
+		color: #0066cc;
+		background-color: rgba(0, 102, 204, 0.1);
+		border-color: #0066cc;
+	}
+	.email-body-container {
+		border: 1px solid #ccc;
+		padding: 15px;
+		background: #fff;
+		min-height: 200px;
+		font-size: 11px;
+		line-height: 1.6;
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+		word-break: break-word;
+		overflow-x: auto;
+		max-width: 100%;
+	}
+	</style>
+</head>
+
+<body bgcolor="#ffffff">
+
+<div align="center" class="page-container">
+
+<table border="0" cellspacing="0" cellpadding="0">
+
+<!-- Top bar -->
+<tr><td colspan="5" style="line-height:0; font-size:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></td></tr>
+<!-- Blue separator to eliminate any white seam under topbar -->
+<tr><td colspan="5" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt=""></td></tr>
+
+<tr>
+	<!-- Left pinstripe -->
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan="2"><br /></td>
+	
+	<!-- Left sidebar (menu and folders) -->
+	<td valign="top" width="180" bgcolor="#0066cc" align="left">
+		<table cellspacing="0" cellpadding="0" border="0" width="180" style="background-color:#0066cc;">
+			<tr style="background-color:#0066cc;">
+				<td style="background-color:#0066cc;"><img src="/src/spacer.gif" width="10" height="1"></td>
+				<td valign="top" style="background-color:#0066cc; padding-top:0;">
+					<!-- Removed top spacer to eliminate white gap under topbar -->
+					
+					<!-- Title -->
+					<div style="margin-bottom: 10px;">
+						<h3 id="mailbox-title" style="color: white; font-size: 12px; margin: 0; padding:0; font-weight: bold;">WebMail: Loading...</h3>
+					</div>
+					
+					<!-- Search box -->
+					<div style="margin-bottom: 10px;">
+						<input type="text" id="search-box" class="search-box" placeholder="Search emails..." onkeyup="handleSearch()" style="width: 100%; box-sizing: border-box; padding: 6px; font-size: 10px; border: 1px solid #004488; background-color: white;" />
+					</div>
+					
+				<!-- Menu items (top) -->
+				<div class="sidebar-menu" style="margin-bottom: 10px;">
+					<a href="#" class="sidebar-menu-item" onclick="return false;">Compose</a>
+				</div>
+				
+				<!-- Special folders (always visible) -->
+				<div id="special-folders-list" style="margin-bottom: 10px;"></div>
+				
+				<!-- Folders section -->
+				<div style="color: white; font-size: 10px; font-weight: bold; margin-bottom: 5px;">Folders</div>
+				<div style="margin-bottom: 8px;">
+					<input type="text" id="folder-search" class="search-box" placeholder="Filter folders..." style="width: 100%; box-sizing: border-box; padding: 4px; font-size: 9px; border: 1px solid #004488; background-color: white;" />
+				</div>
+				<div id="folder-list">
+					<div class="loading">Loading...</div>
+					<!-- Example overflow demos (will be replaced by real folders when loaded) -->
+				</div>
+				<!-- Bottom actions: Help / Log Off -->
+				<div style="margin-top: 12px; border-top: 1px solid #ff9900; padding-top: 10px;">
+					<a href="/search.html" class="sidebar-menu-item">Comprehensive Search</a>
+					<a href="mailto:webmailhelp@enroncorp.com" class="sidebar-menu-item">Help</a>
+					<a href="#" onclick="app.logout(); return false;" class="sidebar-menu-item">Log Off</a>
+				</div>				</td>
+				<td><img src="/src/spacer.gif" width="5" height="1"></td>
+			</tr>
+		</table>
+	</td>
+	
+	<!-- Sidebar pinstripe -->
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan="2"><br /></td>
+	
+	<!-- Main content area -->
+	<td valign="top" colspan="1" rowspan="2">
+		<table cellspacing="0" cellpadding="0" border="0" width="100%">
+			<tr>
+				<td style="padding: 10px 13px;">
+					<!-- Uniform padding on all sides for content area -->
+					
+					<!-- Email list container -->
+					<div id="email-list-container">
+						<div class="no-results">Loading emails...</div>
+					</div>
+					
+					<!-- Inline email detail view -->
+					<div id="email-detail">
+						<div id="email-detail-content"></div>
+					</div>
+					
+				<!-- Pagination -->
+				<div class="pagination" id="pagination" style="text-align:center;">
+					<!-- First row: Previous and Next buttons -->
+					<div class="pagination-row">
+						<a href="#" id="prev-link" data-disabled="false"
+							onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_hover.png'}"
+							onmouseout ="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_on.png'}"
+							onclick   ="if(this.dataset.disabled==='true') return false; app.previousPage(); return false;">
+							<img id="prev-img" src="/src/previous_on.png" alt="Previous" style="vertical-align:middle;">
+						</a>
+						<a href="#" id="next-link" data-disabled="false"
+							onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_hover.png'}"
+							onmouseout ="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_on.png'}"
+							onclick   ="if(this.dataset.disabled==='true') return false; app.nextPage(); return false;">
+							<img id="next-img" src="/src/next_on.png" alt="Next" style="vertical-align:middle;">
+						</a>
+					</div>
+					<!-- Second row: Page info and jump input -->
+					<div class="pagination-row">
+						<span class="page-info" id="page-info"></span>
+						<input type="number" id="page-jump" min="1" placeholder="#" style="width: 50px; min-width: 50px; padding: 4px; font-size: 10px; text-align: center; border: 1px solid #ccc;" onkeypress="if(event.key==='Enter'){app.jumpToPage(parseInt(this.value)); this.blur();}" title="Jump to page" />
+					</div>
+				</div>				</td>
+			</tr>
+		</table>
+	</td>
+	
+	<!-- Right pinstripe -->
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan="2"><br /></td>
+</tr>
+
+<!-- Separate row for sidebar footer with navimage, spans full 180px sidebar -->
+<tr>
+	<td valign="bottom" bgcolor="#0066cc" align="left" style="line-height:0; font-size:0; width:180px;">
+		<img src="/src/navimage.gif" style="display:block;">
+	</td>
+</tr>
+
+<!-- Bottom pinstripe -->
+<tr><td valign="top" class="gridLine" bgcolor="#0066cc" colspan="5" style="line-height:0; font-size:0;"><img src="/src/spacer.gif" width="1" height="1" alt="spacer" style="display:block;"></td></tr>
+
+<!-- Bottom bar -->
+<tr><td colspan="5" style="line-height:0; font-size:0;"><img src="/src/bottombar.gif" style="display:block;"></td></tr>
+
+</table>
+
+</div>
+
+<script src="mailbox-app.js?v=39"></script>
+
+</body>
+</html>

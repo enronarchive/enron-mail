@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Enron WebMail: Search</title>
+	<link rel="stylesheet" href="/src/mail.css" type="text/css">
+	<style>
+	.page-container {
+		max-width: 727px;
+		width: 100%;
+		margin: 0 auto;
+	}
+	
+	/* Search-specific styles */
+	.search-input-large {
+		width: 100%;
+		padding: 8px;
+		border: 2px solid #0066cc;
+		font-size: 12px;
+		margin-bottom: 10px;
+		box-sizing: border-box;
+	}
+	
+	.search-button {
+		background-color: #ff9900;
+		color: white;
+		padding: 10px 30px;
+		border: none;
+		font-weight: bold;
+		cursor: pointer;
+		font-size: 12px;
+		margin-bottom: 15px;
+		width: 100%;
+	}
+	
+	.search-button:hover {
+		background-color: #cc7700;
+	}
+	
+	.search-button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	
+	.filter-group {
+		margin-bottom: 10px;
+		font-size: 11px;
+	}
+	
+	.filter-group label {
+		display: block;
+		font-weight: bold;
+		color: white;
+		margin-bottom: 3px;
+		font-size: 10px;
+	}
+	
+	.filter-group select,
+	.filter-group input[type="date"] {
+		width: 100%;
+		padding: 6px;
+		border: 1px solid #0066cc;
+		font-size: 11px;
+		box-sizing: border-box;
+	}
+	
+	.status-bar {
+		background-color: #f5f5f5;
+		border: 1px solid #ccc;
+		padding: 10px;
+		margin-bottom: 15px;
+		text-align: center;
+		font-size: 11px;
+	}
+	
+	.loading-spinner {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border: 2px solid #f3f3f3;
+		border-top: 2px solid #0066cc;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		vertical-align: middle;
+		margin-right: 5px;
+	}
+	
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+	
+	.result-item {
+		border: 1px solid #e0e0e0;
+		margin-bottom: 10px;
+		padding: 12px;
+		background-color: white;
+		cursor: pointer;
+		font-size: 11px;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		max-width: 100%;
+	}
+	
+	.result-item:hover {
+		background-color: #f8f8f8;
+		border-color: #0066cc;
+	}
+	
+	.result-subject {
+		font-weight: bold;
+		color: #0066cc;
+		font-size: 13px;
+		margin-bottom: 5px;
+	}
+	
+	.result-meta {
+		font-size: 11px;
+		color: #666;
+		margin-bottom: 8px;
+	}
+	
+	.result-preview {
+		font-size: 11px;
+		color: #333;
+		line-height: 1.4;
+	}
+	
+	.highlight {
+		background-color: #ffff00;
+		font-weight: bold;
+	}
+	
+	.badge {
+		display: inline-block;
+		padding: 2px 8px;
+		background-color: #ff9900;
+		color: white;
+		font-size: 10px;
+		font-weight: bold;
+		margin-right: 5px;
+	}
+	
+	.no-results {
+		text-align: center;
+		padding: 40px;
+		color: #666;
+		font-size: 12px;
+	}
+	
+	.pagination {
+		text-align: center;
+		margin-top: 20px;
+		padding: 15px 0;
+	}
+	
+	.pagination .page-info {
+		display: inline-block;
+		margin: 0 15px;
+		font-size: 11px;
+		color: #666;
+		vertical-align: middle;
+	}
+	
+	.mailbox-dropdown {
+		width: 100%;
+		padding: 6px;
+		border: 1px solid #0066cc;
+		font-size: 11px;
+		box-sizing: border-box;
+		background-color: white;
+		cursor: pointer;
+		color: #333;
+	}
+	
+	.mailbox-checkboxes {
+		max-height: 200px;
+		overflow-y: auto;
+		border: 1px solid #0066cc;
+		background-color: white;
+		padding: 5px;
+		margin-top: 5px;
+		display: none;
+	}
+	
+	.mailbox-checkboxes.show {
+		display: block;
+	}
+	
+	.mailbox-checkboxes label {
+		display: block;
+		color: #333;
+		font-size: 10px;
+		font-weight: normal;
+		margin: 2px 0;
+		padding: 2px;
+	}
+	
+	.mailbox-checkboxes input[type="checkbox"] {
+		width: auto;
+		margin-right: 5px;
+	}
+	
+	.select-all-link {
+		color: #ff9900;
+		font-size: 10px;
+		cursor: pointer;
+		text-decoration: underline;
+		margin-bottom: 5px;
+		display: inline-block;
+	}
+	
+	.collapse-toggle {
+		color: #ff9900;
+		font-size: 10px;
+		cursor: pointer;
+		text-decoration: underline;
+		margin-bottom: 5px;
+		display: block;
+		font-weight: bold;
+	}
+	</style>
+</head>
+
+<body bgcolor="#ffffff">
+
+<div align="center" class="page-container">
+
+<table border="0" cellspacing="0" cellpadding="0">
+
+<!-- Top bar -->
+<tr><td colspan="5" style="line-height:0; font-size:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></td></tr>
+<!-- Blue separator -->
+<tr><td colspan="5" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt=""></td></tr>
+
+<tr>
+	<!-- Left pinstripe -->
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan="2"><br /></td>
+	
+	<!-- Left sidebar -->
+	<td valign="top" width="180" bgcolor="#0066cc" align="left">
+		<table cellspacing="0" cellpadding="0" border="0" width="180" style="background-color:#0066cc;">
+			<tr style="background-color:#0066cc;">
+				<td style="background-color:#0066cc;"><img src="/src/spacer.gif" width="10" height="1"></td>
+				<td valign="top" style="background-color:#0066cc; padding-top:0;">
+					
+					<!-- Title -->
+					<div style="margin-bottom: 10px;">
+						<h3 style="color: white; font-size: 12px; margin: 0; padding:0; font-weight: bold;">Search All Mailboxes</h3>
+					</div>
+					
+					<!-- Search Filters -->
+					<div style="margin-bottom: 10px;">
+						<div class="filter-group">
+							<label>Search Terms (optional):</label>
+							<input type="text" id="searchInput" class="search-input-large" placeholder="Enter search terms (optional)...">
+						</div>
+						
+					<div class="filter-group">
+						<label>Mailboxes:</label>
+						<div class="mailbox-dropdown" id="mailboxDropdown" onclick="toggleMailboxList()">
+							Click to select mailboxes...
+						</div>
+						<div id="mailboxCheckboxes" class="mailbox-checkboxes">
+							<a href="#" class="select-all-link" onclick="toggleAllMailboxes(); return false;">Select All / None</a>
+						</div>
+					</div>						<div class="filter-group">
+							<label>From Date:</label>
+							<input type="date" id="dateFrom">
+						</div>
+						
+						<div class="filter-group">
+							<label>To Date:</label>
+							<input type="date" id="dateTo">
+						</div>
+						
+						<div class="filter-group">
+							<label style="display: block; margin-bottom: 5px;">
+								<input type="checkbox" id="searchAttachments" style="width: auto; margin-right: 5px;">
+								Include attachments
+							</label>
+						</div>
+						
+						<button class="search-button" onclick="performSearch()">Search</button>
+					</div>
+					
+				</td>
+				<td><img src="/src/spacer.gif" width="5" height="1"></td>
+			</tr>
+		</table>
+	</td>
+	
+	<!-- Sidebar pinstripe -->
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan="2"><br /></td>
+	
+	<!-- Main content area -->
+	<td valign="top" width="543" colspan="1" rowspan="2">
+		<table cellspacing="0" cellpadding="0" border="0" width="543">
+			<tr>
+				<td style="padding: 10px 13px; width: 543px; max-width: 543px; overflow-x: hidden; box-sizing: border-box;">
+					
+					<!-- Status Bar -->
+					<div id="statusBar" style="display: none;" class="status-bar">
+						<div id="statusText" style="font-weight: bold; color: #0066cc;"></div>
+						<div id="loading" style="display: none; margin-top: 5px;">
+							<span class="loading-spinner"></span>
+							<span style="color: #666;">Searching...</span>
+						</div>
+					</div>
+					
+					<!-- Search Results -->
+					<div id="results"></div>
+					
+					<!-- Pagination -->
+					<div class="pagination" id="pagination" style="display: none;">
+						<a href="#" id="prev-link" data-disabled="false"
+							onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_hover.png'}"
+							onmouseout="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_on.png'}"
+							onclick="if(this.dataset.disabled==='true') return false; changePage(-1); return false;">
+							<img id="prev-img" src="/src/previous_on.png" alt="Previous" style="vertical-align:middle;">
+						</a>
+						<img src="/src/spacer.gif" width="5" height="33" alt="">
+						<span class="page-info" id="pageInfo" style="vertical-align:middle;"></span>
+						<img src="/src/spacer.gif" width="5" height="33" alt="">
+						<a href="#" id="next-link" data-disabled="false"
+							onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_hover.png'}"
+							onmouseout="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_on.png'}"
+							onclick="if(this.dataset.disabled==='true') return false; changePage(1); return false;">
+							<img id="next-img" src="/src/next_on.png" alt="Next" style="vertical-align:middle;">
+						</a>
+					</div>
+					
+					<!-- Initial message -->
+					<div id="initialMessage" style="text-align: center; padding: 60px 20px; color: #666;">
+						<div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">Search All Enron Emails</div>
+						<div style="font-size: 11px;">Enter search terms and/or select date filters in the sidebar, then click Search.</div>
+					</div>
+					
+				</td>
+			</tr>
+		</table>
+	</td>
+	
+	<!-- Right pinstripe -->
+	<td valign="top" align="left" width="1" class="gridLine" bgcolor="#0066cc" rowspan="2"><br /></td>
+</tr>
+
+<!-- Separate row for sidebar footer with navimage -->
+<tr>
+	<td valign="bottom" bgcolor="#0066cc" align="left" style="line-height:0; font-size:0; width:180px;">
+		<img src="/src/navimage.gif" style="display:block;">
+	</td>
+</tr>
+
+<!-- Bottom pinstripe -->
+<tr><td valign="top" class="gridLine" bgcolor="#0066cc" colspan="5" style="line-height:0; font-size:0;"><img src="/src/spacer.gif" width="1" height="1" alt="spacer" style="display:block;"></td></tr>
+
+<!-- Bottom bar -->
+<tr><td colspan="5" style="line-height:0; font-size:0;"><img src="/src/bottombar.gif" style="display:block;"></td></tr>
+
+</table>
+
+</div> <!-- page-container -->
+
+<script src="/mail/mailbox-app.js"></script>
+<script>
+	let allMailboxes = [];
+	let searchResults = [];
+	let currentPage = 1;
+	const resultsPerPage = 50;
+
+	// Initialize
+	async function init() {
+		console.log('Init called, readyState:', document.readyState);
+		console.log('Has savedParams:', !!sessionStorage.getItem('searchParams'));
+		console.log('Has from_search flag:', !!sessionStorage.getItem('from_search'));
+		
+		await loadMailboxList();
+		populateMailboxFilter();
+		
+		// Restore search parameters and re-run search if returning from email view
+		const savedParams = sessionStorage.getItem('searchParams');
+		if (savedParams && sessionStorage.getItem('from_search')) {
+			console.log('Attempting to restore search...');
+			try {
+				const params = JSON.parse(savedParams);
+				
+				// Restore search inputs
+				document.getElementById('searchInput').value = params.searchTerm || '';
+				document.getElementById('dateFrom').value = params.dateFrom || '';
+				document.getElementById('dateTo').value = params.dateTo || '';
+				document.getElementById('searchAttachments').checked = params.searchAttachments || false;
+				
+				// Restore mailbox selections
+				if (params.selectedMailboxes) {
+					const checkboxes = document.querySelectorAll('.mailbox-checkbox');
+					checkboxes.forEach(cb => {
+						cb.checked = params.selectedMailboxes.includes(cb.value);
+					});
+				}
+				
+				// Auto-run the search
+				console.log('Setting up UI for search restoration...');
+				document.getElementById('initialMessage').style.display = 'none';
+				document.getElementById('statusBar').style.display = 'block';
+				document.getElementById('loading').style.display = 'block';
+				document.getElementById('statusText').textContent = 'Restoring previous search...';
+				console.log('Starting search in 100ms...');
+				setTimeout(() => performSearch(), 100);
+			} catch (e) {
+				console.error('Error restoring search params:', e);
+			}
+			sessionStorage.removeItem('from_search');
+		}
+		
+		// Allow search on Enter key
+		document.getElementById('searchInput').addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') {
+				performSearch();
+			}
+		});
+	}
+
+	async function loadMailboxList() {
+		try {
+			const response = await fetch('redirectLogic.js');
+			const text = await response.text();
+			const match = text.match(/validMailboxes\s*=\s*\[([\s\S]*?)\]/);
+			if (match) {
+				const mailboxesText = match[1];
+				const allFromFile = mailboxesText
+					.split(',')
+					.map(m => m.trim().replace(/['"]/g, ''))
+					.filter(m => m);
+				
+				// Verify each mailbox exists by trying to fetch its index.json
+				for (const mailbox of allFromFile) {
+					try {
+						const testResponse = await fetch(`/mail/${mailbox}/index.json`, { method: 'HEAD' });
+						if (testResponse.ok) {
+							allMailboxes.push(mailbox);
+						}
+					} catch (e) {
+						// Skip mailboxes that don't exist
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error loading mailbox list:', error);
+		}
+	}
+
+	function populateMailboxFilter() {
+		const container = document.getElementById('mailboxCheckboxes');
+		allMailboxes.forEach(mailbox => {
+			const label = document.createElement('label');
+			const checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.value = mailbox;
+			checkbox.checked = true; // All checked by default
+			checkbox.className = 'mailbox-checkbox';
+		label.appendChild(checkbox);
+		label.appendChild(document.createTextNode(` ${mailbox}`));
+		container.appendChild(label);
+	});
+}
+
+	function toggleAllMailboxes() {
+		const checkboxes = document.querySelectorAll('.mailbox-checkbox');
+		const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+		checkboxes.forEach(cb => cb.checked = !allChecked);
+	}
+	
+	function toggleMailboxList() {
+		const container = document.getElementById('mailboxCheckboxes');
+		container.classList.toggle('show');
+	}
+
+	async function performSearch() {
+		const searchTerm = document.getElementById('searchInput').value.trim();
+		const dateFrom = document.getElementById('dateFrom').value;
+		const dateTo = document.getElementById('dateTo').value;
+		
+		// Require either a search term OR a date filter
+		if (!searchTerm && !dateFrom && !dateTo) {
+			alert('Please enter a search term or select a date range');
+			return;
+		}
+
+		// Get selected mailboxes
+		const checkboxes = document.querySelectorAll('.mailbox-checkbox:checked');
+		const selectedMailboxes = Array.from(checkboxes).map(cb => cb.value);
+		
+		if (selectedMailboxes.length === 0) {
+			alert('Please select at least one mailbox to search');
+			return;
+		}
+
+		const searchAttachments = document.getElementById('searchAttachments').checked;
+
+		// Reset to page 1
+		currentPage = 1;
+
+		// Hide initial message
+		document.getElementById('initialMessage').style.display = 'none';
+		
+		// Show loading state
+		document.getElementById('statusBar').style.display = 'block';
+		document.getElementById('loading').style.display = 'block';
+		document.getElementById('statusText').textContent = 'Starting search...';
+		document.getElementById('results').innerHTML = '';
+		
+		const searchBtn = document.querySelector('.search-button');
+		searchBtn.disabled = true;
+
+		searchResults = [];
+		let searchedCount = 0;
+
+		try {
+			for (const mailbox of selectedMailboxes) {
+				searchedCount++;
+				document.getElementById('statusText').textContent = 
+					`Searching ${searchedCount} of ${selectedMailboxes.length} mailboxes...`;
+				
+			await searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments);
+		}
+
+		// Save only search parameters to sessionStorage (not results - too large)
+		sessionStorage.setItem('searchParams', JSON.stringify({
+			searchTerm: searchTerm,
+			selectedMailboxes: selectedMailboxes,
+			dateFrom: dateFrom,
+			dateTo: dateTo,
+			searchAttachments: searchAttachments
+		}));
+
+		// Display results
+		displayResults();
+		} catch (error) {
+			console.error('Search error:', error);
+		document.getElementById('results').innerHTML = 
+			'<div class="no-results">An error occurred during search</div>';
+	} finally {
+		document.getElementById('loading').style.display = 'none';
+		searchBtn.disabled = false;
+	}
+}
+
+async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments) {
+		try {
+			const response = await fetch(`/mail/${mailbox}/index.json`);
+			if (!response.ok) return;
+			
+			const data = await response.json();
+			const emails = data.emails || [];
+			const searchTermLower = searchTerm ? searchTerm.toLowerCase() : '';
+
+			for (const email of emails) {
+				let matches = false;
+				let matchContext = '';
+
+				// If no search term, check date filter only
+				if (!searchTerm) {
+					matches = true; // Will be filtered by date below
+					matchContext = email.subject || '(No subject)';
+				} else {
+					// Search in subject
+					if (email.subject && email.subject.toLowerCase().includes(searchTermLower)) {
+						matches = true;
+						matchContext = email.subject;
+					}
+
+					// Search in from
+					if (!matches && email.from && 
+						(email.from.name.toLowerCase().includes(searchTermLower) || 
+						 email.from.email.toLowerCase().includes(searchTermLower))) {
+						matches = true;
+						matchContext = `From: ${email.from.name} <${email.from.email}>`;
+					}
+
+					// Search in to
+					if (!matches && email.to) {
+						for (const recipient of email.to) {
+							if (recipient.name.toLowerCase().includes(searchTermLower) || 
+								recipient.email.toLowerCase().includes(searchTermLower)) {
+								matches = true;
+								matchContext = `To: ${recipient.name} <${recipient.email}>`;
+								break;
+							}
+						}
+					}
+
+					// Search in body
+					if (!matches && email.body) {
+						const bodyText = stripHtml(email.body).toLowerCase();
+						if (bodyText.includes(searchTermLower)) {
+							matches = true;
+							matchContext = extractContext(bodyText, searchTermLower);
+						}
+					}
+
+					// Search in attachments
+					if (!matches && searchAttachments && email.attachments) {
+						for (const att of email.attachments) {
+							if (att.filename.toLowerCase().includes(searchTermLower)) {
+								matches = true;
+								matchContext = `Attachment: ${att.filename}`;
+								break;
+							}
+						}
+					}
+				}
+
+				// Date filter - apply whether or not there's a search term
+				if (matches && (dateFrom || dateTo)) {
+					const emailDate = new Date(email.date);
+					if (dateFrom && emailDate < new Date(dateFrom)) matches = false;
+					if (dateTo && emailDate > new Date(dateTo + 'T23:59:59')) matches = false;
+				}
+
+				if (matches) {
+					searchResults.push({
+						...email,
+						mailbox: mailbox,
+						matchContext: matchContext
+					});
+				}
+			}
+		} catch (error) {
+			console.error(`Error searching mailbox ${mailbox}:`, error);
+		}
+	}
+
+	function stripHtml(html) {
+		const tmp = document.createElement('div');
+		tmp.innerHTML = html;
+		return tmp.textContent || tmp.innerText || '';
+	}
+
+	function extractContext(text, searchTerm, contextLength = 150) {
+		const index = text.toLowerCase().indexOf(searchTerm.toLowerCase());
+		if (index === -1) return text.substring(0, contextLength);
+		
+		const start = Math.max(0, index - contextLength / 2);
+		const end = Math.min(text.length, index + searchTerm.length + contextLength / 2);
+		
+		let context = text.substring(start, end);
+		if (start > 0) context = '...' + context;
+		if (end < text.length) context = context + '...';
+		
+		return context;
+	}
+
+	function highlightText(text, searchTerm) {
+		if (!text || !searchTerm) return text || '';
+		const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
+		return text.replace(regex, '<span class="highlight">$1</span>');
+	}
+	
+	function escapeRegex(str) {
+		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
+
+	function displayResults() {
+		const resultsDiv = document.getElementById('results');
+		const paginationDiv = document.getElementById('pagination');
+		const searchTerm = document.getElementById('searchInput').value.trim();
+		
+		document.getElementById('statusText').textContent = 
+			`Found ${searchResults.length} result${searchResults.length !== 1 ? 's' : ''}`;
+
+		if (searchResults.length === 0) {
+			resultsDiv.innerHTML = `
+				<div class="no-results">
+					<div style="font-weight: bold; margin-bottom: 5px;">No results found</div>
+					<div>Try different search terms or filters</div>
+				</div>
+			`;
+			paginationDiv.style.display = 'none';
+			return;
+		}
+
+		// Sort by date (newest first)
+		searchResults.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+		// Calculate pagination
+		const totalPages = Math.ceil(searchResults.length / resultsPerPage);
+		const startIndex = (currentPage - 1) * resultsPerPage;
+		const endIndex = Math.min(startIndex + resultsPerPage, searchResults.length);
+		const pageResults = searchResults.slice(startIndex, endIndex);
+
+		// Display paginated results
+		resultsDiv.innerHTML = pageResults.map(result => {
+			const date = new Date(result.date).toLocaleString();
+			const fromName = result.from?.name || 'Unknown';
+			const toList = result.to?.slice(0, 3).map(r => r.name).join(', ') || 'Unknown';
+			const hasMore = result.to?.length > 3 ? ` +${result.to.length - 3}` : '';
+			
+			return `
+				<div class="result-item" onclick="openEmail('${result.mailbox}', '${result.id}')">
+					<div class="result-subject">${searchTerm ? highlightText(result.subject || '(No Subject)', searchTerm) : (result.subject || '(No Subject)')}</div>
+					<div class="result-meta">
+						<span class="badge">${result.mailbox}</span>
+						<span class="badge" style="background-color: #0066cc;">${result.folder || 'Inbox'}</span>
+						${date}
+					</div>
+					<div class="result-meta">
+						From: ${searchTerm ? highlightText(fromName, searchTerm) : fromName} | 
+						To: ${searchTerm ? highlightText(toList + hasMore, searchTerm) : (toList + hasMore)}
+						${result.attachments?.length ? ` | Attachments: ${result.attachments.length}` : ''}
+					</div>
+					<div class="result-preview">
+						${searchTerm ? highlightText(result.matchContext || stripHtml(result.body).substring(0, 200) + '...', searchTerm) : (result.matchContext || stripHtml(result.body).substring(0, 200) + '...')}
+					</div>
+				</div>
+			`;
+		}).join('');
+
+		// Update pagination controls
+		if (totalPages > 1) {
+			paginationDiv.style.display = 'block';
+			document.getElementById('pageInfo').textContent = 
+				`Page ${currentPage} of ${totalPages} (${startIndex + 1}-${endIndex} of ${searchResults.length})`;
+			
+			// Update previous link/image
+			const prevLink = document.getElementById('prev-link');
+			const prevImg = document.getElementById('prev-img');
+			if (currentPage === 1) {
+				prevLink.dataset.disabled = 'true';
+				prevImg.src = '/src/previous_off.png';
+			} else {
+				prevLink.dataset.disabled = 'false';
+				prevImg.src = '/src/previous_on.png';
+			}
+			
+			// Update next link/image
+			const nextLink = document.getElementById('next-link');
+			const nextImg = document.getElementById('next-img');
+			if (currentPage === totalPages) {
+				nextLink.dataset.disabled = 'true';
+				nextImg.src = '/src/next_off.png';
+			} else {
+				nextLink.dataset.disabled = 'false';
+				nextImg.src = '/src/next_on.png';
+			}
+		} else {
+			paginationDiv.style.display = 'none';
+		}
+		
+		// Scroll to top of results
+		document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}
+
+	function changePage(direction) {
+		currentPage += direction;
+		displayResults();
+}
+
+function openEmail(mailbox, emailId) {
+	sessionStorage.setItem('from_search', 'true');
+	localStorage.setItem('enron_current_mailbox', mailbox);
+	sessionStorage.setItem('from_search_direct', 'true');
+	window.location.href = `/mail/index.html?email=${emailId}`;
+}
+	function logout() {
+		sessionStorage.setItem('logging_out', 'true');
+		localStorage.removeItem('enron_current_mailbox');
+		localStorage.removeItem('enron_current_email');
+		window.location.href = '/index.html';
+	}
+
+	// Initialize on page load
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+[[redirects]]
+  from = "/mail/*/attachments/*"
+  to = "https://huggingface.co/datasets/enronarchive/mail/resolve/main/mail/:splat"
+  status = 200
+  force = true
+
+# Optional: Add headers for better caching
+[[headers]]
+  for = "/mail/*/attachments/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
