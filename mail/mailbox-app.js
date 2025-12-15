@@ -473,7 +473,10 @@ class MailboxApp {
         this.currentFolder = folderName;
         this.currentPage = 1;
         this.searchTerm = '';
-        document.getElementById('search-box').value = '';
+        const searchBox = document.getElementById('search-box');
+        if (searchBox) {
+            searchBox.value = '';
+        }
         
         // Update URL with folder parameter
         this.updateUrl({ folder: folderName, email: null });
