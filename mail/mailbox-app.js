@@ -578,6 +578,10 @@ class MailboxApp {
     
     renderEmailList() {
         const container = document.getElementById('email-list-container');
+        if (!container) {
+            console.warn('Email list container not found, skipping render');
+            return;
+        }
         
         // Show search result count if searching
         let searchResultHtml = '';
@@ -588,7 +592,8 @@ class MailboxApp {
         if (this.filteredEmails.length === 0) {
             const message = this.searchTerm ? 'No emails found matching your search' : 'No emails found';
             container.innerHTML = searchResultHtml + `<div class="no-results">${message}</div>`;
-            document.getElementById('pagination').style.display = 'none';
+            const pagination = document.getElementById('pagination');
+            if (pagination) pagination.style.display = 'none';
             return;
         }
         
@@ -647,6 +652,8 @@ class MailboxApp {
         
         // Update pagination
         const paginationDiv = document.getElementById('pagination');
+        if (!paginationDiv) return; // Exit early if pagination doesn't exist
+        
         const pageInfo = document.getElementById('page-info');
         const prevLink = document.getElementById('prev-link');
         const nextLink = document.getElementById('next-link');

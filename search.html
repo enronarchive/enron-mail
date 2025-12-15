@@ -552,7 +552,26 @@ async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttach
 			if (!response.ok) return;
 			
 			const data = await response.json();
-			const emails = data.emails || [];
+			
+			// Handle split index files
+			let emails = data.emails || [];
+			const totalParts = data.total_parts || 1;
+			
+			if (totalParts > 1) {
+				// Load additional parts
+				for (let i = 2; i <= totalParts; i++) {
+					try {
+						const partResponse = await fetch(`/mail/${mailbox}/index-part-${i}.json`);
+						if (partResponse.ok) {
+							const partData = await partResponse.json();
+							emails = emails.concat(partData.emails || []);
+						}
+					} catch (e) {
+						console.warn(`Failed to load part ${i} for ${mailbox}`);
+					}
+				}
+			}
+			
 			const searchTermLower = searchTerm ? searchTerm.toLowerCase() : '';
 
 			for (const email of emails) {
