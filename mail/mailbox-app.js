@@ -1450,8 +1450,16 @@ class MailboxApp {
 // Global app instance
 let app;
 
-// Initialize when page loads
+// Initialize when page loads (skip on search page)
 window.addEventListener('DOMContentLoaded', () => {
+    // Don't auto-initialize on search page - it has its own initialization
+    const isSearchPage = window.location.pathname.includes('search.html') || 
+                         window.location.href.includes('search.html');
+    if (isSearchPage) {
+        console.log('Skipping MailboxApp initialization on search page');
+        return;
+    }
+    
     app = new MailboxApp();
     app.init();
     

@@ -375,6 +375,16 @@
 		console.log('Has savedParams:', !!sessionStorage.getItem('searchParams'));
 		console.log('Has from_search flag:', !!sessionStorage.getItem('from_search'));
 		
+		// Clear any mailbox URL parameters - search page doesn't use them
+		const url = new URL(window.location.href);
+		if (url.searchParams.has('mailbox') || url.searchParams.has('folder') || url.searchParams.has('email')) {
+			console.log('Removing mailbox URL parameters from search page');
+			url.searchParams.delete('mailbox');
+			url.searchParams.delete('folder');
+			url.searchParams.delete('email');
+			window.history.replaceState({}, document.title, url.pathname + url.search);
+		}
+		
 		await loadMailboxList();
 		populateMailboxFilter();
 		
