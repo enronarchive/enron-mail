@@ -8,8 +8,24 @@
         <!-- this script handles the login logic-->
             <script src="redirectLogic.js"> //see this file for a list of valid logins</script>
             <script>
+            function getTopbarTarget() {
+                var currentMailbox = localStorage.getItem('enron_current_mailbox');
+                return currentMailbox ? '/mail/index.html' : '/index.html';
+            }
+
+            function initTopbarLink() {
+                var topbar = document.getElementById('topbar-link');
+                if (!topbar) { return; }
+                topbar.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = getTopbarTarget();
+                });
+            }
+
             // Check if user is already logged in
             window.addEventListener('DOMContentLoaded', function() {
+                initTopbarLink();
+
                 // Check if navigating to search
                 if (sessionStorage.getItem('navigating_to_search') === 'true') {
                     sessionStorage.removeItem('navigating_to_search');
@@ -65,7 +81,7 @@
             <table border="0" width="727" cellspacing="0" cellpadding="0">
             
             <!-- first row, topbar image - width is defined again here-->
-            <tr><td colspan=3><img src="/src/topbar.jpg" width="727" height="93" border="0" usemap="#topbar_map"></td></tr>
+            <tr><td colspan=3><a href="/index.html" id="topbar-link" style="display:block; line-height:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></a></td></tr>
 
             <!-- line below topbar-->
             <tr><td valign="top" colspan=3 bgcolor="#ffffff" width="727"><img src="/src/spacer.gif" width="727" height="1"></td></tr>

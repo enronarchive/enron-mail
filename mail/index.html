@@ -5,6 +5,23 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Enron WebMail: Mailbox</title>
 	<link rel="stylesheet" href="/src/mail.css" type="text/css">
+	<script>
+	function getTopbarTarget() {
+		var mailbox = localStorage.getItem('enron_current_mailbox');
+		return mailbox ? '/mail/index.html' : '/index.html';
+	}
+
+	function initTopbarLink() {
+		var topbar = document.getElementById('topbar-link');
+		if (!topbar) { return; }
+		topbar.addEventListener('click', function(e) {
+			e.preventDefault();
+			window.location.href = getTopbarTarget();
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', initTopbarLink);
+	</script>
 	<style>
 	.menuimage {
 		cursor: pointer;
@@ -374,7 +391,7 @@
 <table border="0" cellspacing="0" cellpadding="0">
 
 <!-- Top bar -->
-<tr><td colspan="5" style="line-height:0; font-size:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></td></tr>
+<tr><td colspan="5" style="line-height:0; font-size:0;"><a href="/index.html" id="topbar-link" style="display:block; line-height:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></a></td></tr>
 <!-- Blue separator to eliminate any white seam under topbar -->
 <tr><td colspan="5" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt=""></td></tr>
 

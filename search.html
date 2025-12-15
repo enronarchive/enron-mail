@@ -4,6 +4,23 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Enron WebMail: Search</title>
 	<link rel="stylesheet" href="/src/mail.css" type="text/css">
+	<script>
+	function getTopbarTarget() {
+		var mailbox = localStorage.getItem('enron_current_mailbox');
+		return mailbox ? '/mail/index.html' : '/index.html';
+	}
+
+	function initTopbarLink() {
+		var topbar = document.getElementById('topbar-link');
+		if (!topbar) { return; }
+		topbar.addEventListener('click', function(e) {
+			e.preventDefault();
+			window.location.href = getTopbarTarget();
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', initTopbarLink);
+	</script>
 	<style>
 	.page-container {
 		max-width: 727px;
@@ -150,16 +167,43 @@
 	
 	.pagination {
 		text-align: center;
-		margin-top: 20px;
-		padding: 15px 0;
+		padding: 15px;
+		margin-top: 10px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+	}
+	.pagination-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		flex-wrap: nowrap;
+	}
+	.pagination a {
+		text-decoration: none;
+		border: none;
+		outline: none;
+		display: inline-flex;
+		align-items: center;
+		line-height: 0;
+		flex-shrink: 0;
+	}
+	.pagination a img {
+		display: block;
+		border: none;
 	}
 	
 	.pagination .page-info {
-		display: inline-block;
-		margin: 0 15px;
+		display: inline-flex;
+		align-items: center;
+		margin: 0 10px;
 		font-size: 11px;
 		color: #666;
-		vertical-align: middle;
+		flex-shrink: 0;
+		white-space: nowrap;
 	}
 	
 	.mailbox-dropdown {
@@ -199,6 +243,7 @@
 	.mailbox-checkboxes input[type="checkbox"] {
 		width: auto;
 		margin-right: 5px;
+		accent-color: #0066cc;
 	}
 	
 	.select-all-link {
@@ -229,7 +274,7 @@
 <table border="0" cellspacing="0" cellpadding="0">
 
 <!-- Top bar -->
-<tr><td colspan="5" style="line-height:0; font-size:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></td></tr>
+<tr><td colspan="5" style="line-height:0; font-size:0;"><a href="/index.html" id="topbar-link" style="display:block; line-height:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></a></td></tr>
 <!-- Blue separator -->
 <tr><td colspan="5" bgcolor="#0066cc"><img src="/src/spacer.gif" width="1" height="1" alt=""></td></tr>
 
@@ -259,7 +304,7 @@
 					<div class="filter-group">
 						<label>Mailboxes:</label>
 						<div class="mailbox-dropdown" id="mailboxDropdown" onclick="toggleMailboxList()">
-							Click to select mailboxes...
+							<span class="loading-spinner"></span> Loading mailboxes...
 						</div>
 						<div id="mailboxCheckboxes" class="mailbox-checkboxes">
 							<a href="#" class="select-all-link" onclick="toggleAllMailboxes(); return false;">Select All / None</a>
@@ -276,12 +321,19 @@
 						
 						<div class="filter-group">
 							<label style="display: block; margin-bottom: 5px;">
-								<input type="checkbox" id="searchAttachments" style="width: auto; margin-right: 5px;">
-								Include attachments
-							</label>
-						</div>
-						
-						<button class="search-button" onclick="performSearch()">Search</button>
+							<input type="checkbox" id="searchAttachments" style="width: auto; margin-right: 5px; accent-color: #ff9900;">
+							Include attachments
+						</label>
+					</div>
+					
+					<div class="filter-group">
+						<label style="display: block; margin-bottom: 5px;">
+							<input type="checkbox" id="includeCalendar" style="width: auto; margin-right: 5px; accent-color: #ff9900;">
+							Include calendar entries
+						</label>
+					</div>
+					
+					<button class="search-button" onclick="performSearch()">Search</button>
 					</div>
 					
 				</td>
@@ -313,21 +365,24 @@
 					
 					<!-- Pagination -->
 					<div class="pagination" id="pagination" style="display: none;">
-						<a href="#" id="prev-link" data-disabled="false"
-							onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_hover.png'}"
-							onmouseout="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_on.png'}"
-							onclick="if(this.dataset.disabled==='true') return false; changePage(-1); return false;">
-							<img id="prev-img" src="/src/previous_on.png" alt="Previous" style="vertical-align:middle;">
-						</a>
-						<img src="/src/spacer.gif" width="5" height="33" alt="">
-						<span class="page-info" id="pageInfo" style="vertical-align:middle;"></span>
-						<img src="/src/spacer.gif" width="5" height="33" alt="">
-						<a href="#" id="next-link" data-disabled="false"
-							onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_hover.png'}"
-							onmouseout="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_on.png'}"
-							onclick="if(this.dataset.disabled==='true') return false; changePage(1); return false;">
-							<img id="next-img" src="/src/next_on.png" alt="Next" style="vertical-align:middle;">
-						</a>
+						<div class="pagination-row">
+							<a href="#" id="prev-link" data-disabled="false"
+								onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_hover.png'}"
+								onmouseout="if(this.dataset.disabled!=='true'){document.getElementById('prev-img').src='/src/previous_on.png'}"
+								onclick="if(this.dataset.disabled==='true') return false; changePage(-1); return false;">
+								<img id="prev-img" src="/src/previous_on.png" alt="Previous" style="vertical-align:middle;">
+							</a>
+							<a href="#" id="next-link" data-disabled="false"
+								onmouseover="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_hover.png'}"
+								onmouseout="if(this.dataset.disabled!=='true'){document.getElementById('next-img').src='/src/next_on.png'}"
+								onclick="if(this.dataset.disabled==='true') return false; changePage(1); return false;">
+								<img id="next-img" src="/src/next_on.png" alt="Next" style="vertical-align:middle;">
+							</a>
+						</div>
+						<div class="pagination-row">
+							<span class="page-info" id="page-info"></span>
+							<input type="number" id="page-jump" min="1" placeholder="#" style="width: 50px; min-width: 50px; padding: 4px; font-size: 10px; text-align: center; border: 1px solid #ccc;" onkeypress="if(event.key==='Enter'){jumpToPage(parseInt(this.value)); this.blur();}" title="Jump to page" />
+						</div>
 					</div>
 					
 					<!-- Initial message -->
@@ -431,19 +486,28 @@
 	}
 
 	async function loadMailboxList() {
+		const dropdown = document.getElementById('mailboxDropdown');
 		try {
+			console.log('Loading mailbox list from redirectLogic.js...');
 			const response = await fetch('redirectLogic.js');
+			console.log('redirectLogic.js response:', response.ok, response.status);
 			const text = await response.text();
+			console.log('redirectLogic.js text length:', text.length);
 			const match = text.match(/validMailboxes\s*=\s*\[([\s\S]*?)\]/);
+			console.log('Regex match found:', !!match);
 			if (match) {
 				const mailboxesText = match[1];
 				const allFromFile = mailboxesText
 					.split(',')
 					.map(m => m.trim().replace(/['"]/g, ''))
 					.filter(m => m);
+				console.log('Mailboxes from file:', allFromFile.length);
+				
+				dropdown.innerHTML = `<span class="loading-spinner"></span> Loading mailboxes (0/${allFromFile.length})...`;
 				
 				// Verify each mailbox exists by trying to fetch its index.json
-				for (const mailbox of allFromFile) {
+				for (let i = 0; i < allFromFile.length; i++) {
+					const mailbox = allFromFile[i];
 					try {
 						const testResponse = await fetch(`/mail/${mailbox}/index.json`, { method: 'HEAD' });
 						if (testResponse.ok) {
@@ -452,10 +516,17 @@
 					} catch (e) {
 						// Skip mailboxes that don't exist
 					}
+					// Update progress every 10 mailboxes
+					if (i % 10 === 0 || i === allFromFile.length - 1) {
+						dropdown.innerHTML = `<span class="loading-spinner"></span> Loading mailboxes (${i + 1}/${allFromFile.length})...`;
+					}
 				}
+				console.log('Verified mailboxes:', allMailboxes.length);
+				dropdown.innerHTML = `${allMailboxes.length} mailboxes selected`;
 			}
 		} catch (error) {
 			console.error('Error loading mailbox list:', error);
+			dropdown.innerHTML = 'Error loading mailboxes';
 		}
 	}
 
@@ -506,6 +577,7 @@
 		}
 
 		const searchAttachments = document.getElementById('searchAttachments').checked;
+		const includeCalendar = document.getElementById('includeCalendar').checked;
 
 		// Reset to page 1
 		currentPage = 1;
@@ -531,7 +603,7 @@
 				document.getElementById('statusText').textContent = 
 					`Searching ${searchedCount} of ${selectedMailboxes.length} mailboxes...`;
 				
-			await searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments);
+			await searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments, includeCalendar);
 		}
 
 		// Save only search parameters to sessionStorage (not results - too large)
@@ -555,7 +627,7 @@
 	}
 }
 
-async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments) {
+async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments, includeCalendar) {
 		try {
 			const response = await fetch(`/mail/${mailbox}/index.json`);
 			if (!response.ok) return;
@@ -565,6 +637,17 @@ async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttach
 			// Handle split index files
 			let emails = data.emails || [];
 			const totalParts = data.total_parts || 1;
+			
+			// Validate emails is an array - if it's a single object, wrap it in an array
+			if (!Array.isArray(emails)) {
+				if (typeof emails === 'object' && emails !== null) {
+					console.warn(`Mailbox ${mailbox}: emails field is an object, wrapping in array`);
+					emails = [emails];
+				} else {
+					console.error(`Mailbox ${mailbox}: emails field is not an array or object, skipping`);
+					return;
+				}
+			}
 			
 			if (totalParts > 1) {
 				// Load additional parts
@@ -646,22 +729,29 @@ async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttach
 					if (dateTo && emailDate > new Date(dateTo + 'T23:59:59')) matches = false;
 				}
 
-				if (matches) {
-					searchResults.push({
-						...email,
-						mailbox: mailbox,
-						matchContext: matchContext
-					});
-				}
+			// Skip calendar folders if includeCalendar is false
+			if (matches && !includeCalendar && email.folder && email.folder.toLowerCase().includes('calendar')) {
+				matches = false;
 			}
-		} catch (error) {
-			console.error(`Error searching mailbox ${mailbox}:`, error);
-		}
-	}
 
-	function stripHtml(html) {
+			if (matches) {
+				searchResults.push({
+					...email,
+					mailbox: mailbox,
+					matchContext: matchContext
+				});
+			}
+		}
+	} catch (error) {
+		console.error(`Error searching mailbox ${mailbox}:`, error);
+	}
+}
+
+function stripHtml(html) {
+	if (!html) return '';
+		const sanitized = html.replace(/(src|href)="cid:[^"]*"/gi, '');
 		const tmp = document.createElement('div');
-		tmp.innerHTML = html;
+		tmp.innerHTML = sanitized;
 		return tmp.textContent || tmp.innerText || '';
 	}
 
@@ -692,6 +782,8 @@ async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttach
 	function displayResults() {
 		const resultsDiv = document.getElementById('results');
 		const paginationDiv = document.getElementById('pagination');
+		const pageInfoEl = document.getElementById('page-info');
+		const pageJumpInput = document.getElementById('page-jump');
 		const searchTerm = document.getElementById('searchInput').value.trim();
 		
 		document.getElementById('statusText').textContent = 
@@ -747,29 +839,35 @@ async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttach
 		// Update pagination controls
 		if (totalPages > 1) {
 			paginationDiv.style.display = 'block';
-			document.getElementById('pageInfo').textContent = 
-				`Page ${currentPage} of ${totalPages} (${startIndex + 1}-${endIndex} of ${searchResults.length})`;
+			if (pageInfoEl) {
+				pageInfoEl.textContent = `Page ${currentPage} of ${totalPages} (${startIndex + 1}-${endIndex} of ${searchResults.length})`;
+			}
+			if (pageJumpInput) {
+				pageJumpInput.max = totalPages;
+				pageJumpInput.value = '';
+				pageJumpInput.placeholder = `1-${totalPages}`;
+			}
 			
 			// Update previous link/image
 			const prevLink = document.getElementById('prev-link');
 			const prevImg = document.getElementById('prev-img');
-			if (currentPage === 1) {
-				prevLink.dataset.disabled = 'true';
-				prevImg.src = '/src/previous_off.png';
-			} else {
-				prevLink.dataset.disabled = 'false';
-				prevImg.src = '/src/previous_on.png';
+			const prevDisabled = currentPage === 1;
+			if (prevLink && prevImg) {
+				prevLink.dataset.disabled = prevDisabled ? 'true' : 'false';
+				prevLink.style.pointerEvents = prevDisabled ? 'none' : 'auto';
+				prevImg.src = prevDisabled ? '/src/previous_off.png' : '/src/previous_on.png';
+				prevImg.style.opacity = prevDisabled ? '0.5' : '1';
 			}
 			
 			// Update next link/image
 			const nextLink = document.getElementById('next-link');
 			const nextImg = document.getElementById('next-img');
-			if (currentPage === totalPages) {
-				nextLink.dataset.disabled = 'true';
-				nextImg.src = '/src/next_off.png';
-			} else {
-				nextLink.dataset.disabled = 'false';
-				nextImg.src = '/src/next_on.png';
+			const nextDisabled = currentPage === totalPages;
+			if (nextLink && nextImg) {
+				nextLink.dataset.disabled = nextDisabled ? 'true' : 'false';
+				nextLink.style.pointerEvents = nextDisabled ? 'none' : 'auto';
+				nextImg.src = nextDisabled ? '/src/next_off.png' : '/src/next_on.png';
+				nextImg.style.opacity = nextDisabled ? '0.5' : '1';
 			}
 		} else {
 			paginationDiv.style.display = 'none';
@@ -780,15 +878,23 @@ async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttach
 	}
 
 	function changePage(direction) {
-		currentPage += direction;
+		const totalPages = Math.ceil(searchResults.length / resultsPerPage) || 1;
+		currentPage = Math.min(Math.max(1, currentPage + direction), totalPages);
 		displayResults();
-}
+	}
+
+	function jumpToPage(page) {
+		const totalPages = Math.ceil(searchResults.length / resultsPerPage) || 1;
+		if (!page || page < 1 || page > totalPages) return;
+		currentPage = page;
+		displayResults();
+	}
 
 function openEmail(mailbox, emailId) {
 	sessionStorage.setItem('from_search', 'true');
 	localStorage.setItem('enron_current_mailbox', mailbox);
 	sessionStorage.setItem('from_search_direct', 'true');
-	window.location.href = `/mail/index.html?email=${emailId}`;
+	window.location.href = `/mail/index.html?mailbox=${mailbox}&email=${emailId}`;
 }
 	function logout() {
 		sessionStorage.setItem('logging_out', 'true');

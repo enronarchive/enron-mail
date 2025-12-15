@@ -163,7 +163,7 @@ class MailboxApp {
             // Update title
             const titleElement = document.getElementById('mailbox-title');
             if (titleElement) {
-                const displayName = this.formatMailboxName(this.mailboxData.mailbox || this.mailboxName);
+                const displayName = this.getMailboxDisplayName();
                 titleElement.textContent = `WebMail: ${displayName}`;
             }
             
@@ -307,6 +307,72 @@ class MailboxApp {
         return name.split('-').map(part => 
             part.charAt(0).toUpperCase() + part.slice(1)
         ).join(' ');
+    }
+
+    getMailboxDisplayName() {
+        const fallback = this.formatMailboxName(this.mailboxData.mailbox || this.mailboxName);
+        const emails = this.mailboxData && Array.isArray(this.mailboxData.emails) ? this.mailboxData.emails : [];
+        if (!emails.length) {
+            return fallback;
+        }
+
+        const slugParts = (this.mailboxName || '').split('-').filter(Boolean);
+        const lastSlug = slugParts[0] || '';
+        const initial = slugParts[1] ? slugParts[1].charAt(0) : '';
+
+        const prettifyName = (raw) => {
+            const pieces = raw.replace(/,/g, ' ').split(/\s+/).filter(Boolean);
+            if (pieces.length >= 2) {
+                const first = pieces[0];
+                const second = pieces[1];
+                const firstInit = first.charAt(0).toLowerCase();
+                const secondInit = second.charAt(0).toLowerCase();
+                const lowerLast = lastSlug.toLowerCase();
+
+                // Last First -> flip
+                if (first.toLowerCase().startsWith(lowerLast) && initial && secondInit === initial.toLowerCase()) {
+                    return `${this.capitalize(second)} ${this.capitalize(first)}`;
+                }
+                // First Last -> keep
+                if (second.toLowerCase().startsWith(lowerLast) && initial && firstInit === initial.toLowerCase()) {
+                    return `${this.capitalize(first)} ${this.capitalize(second)}`;
+                }
+                // Default to capitalized first two tokens
+                return `${this.capitalize(first)} ${this.capitalize(second)}`;
+            }
+            return this.capitalize(raw);
+        };
+
+        // Prefer a message from any Sent folder so the From field reflects the mailbox owner
+        let candidate = null;
+        for (const e of emails) {
+            const folder = (e.folder || '').toLowerCase();
+            if (!folder.includes('sent')) continue;
+
+            const fromName = (e.from && e.from.name) ? e.from.name.trim() : '';
+            const fromEmail = (e.from && e.from.email) ? e.from.email.trim() : '';
+            const derived = fromName || (fromEmail ? fromEmail.split('@')[0] : '');
+            if (!derived) continue;
+
+            const lowerName = derived.toLowerCase();
+            const hasLast = lastSlug && lowerName.includes(lastSlug.toLowerCase());
+            const hasInitial = initial ? lowerName.includes(initial.toLowerCase()) : true;
+            if (hasLast && hasInitial) {
+                candidate = derived;
+                break;
+            }
+        }
+
+        if (!candidate) {
+            return fallback;
+        }
+
+        return prettifyName(candidate);
+    }
+
+    capitalize(word) {
+        if (!word) return '';
+        return word.charAt(0).toUpperCase() + word.slice(1);
     }
     
     renderFolders() {
@@ -827,6 +893,14 @@ class MailboxApp {
     }
 
     goBack() {
+        // Check if we came from search page
+        if (sessionStorage.getItem('from_search_direct')) {
+            sessionStorage.removeItem('from_search_direct');
+            sessionStorage.setItem('from_search', 'true');
+            window.location.href = '/search.html';
+            return;
+        }
+        
         // Use browser history to navigate back
         try {
             window.history.back();

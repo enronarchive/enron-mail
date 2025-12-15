@@ -6,6 +6,24 @@
 
 <LINK REL=stylesheet HREF="/src/mail.css" TYPE="text/css">
 
+<script>
+function getTopbarTarget() {
+    var mailbox = localStorage.getItem('enron_current_mailbox');
+    return mailbox ? '/mail/index.html' : '/index.html';
+}
+
+function initTopbarLink() {
+    var topbar = document.getElementById('topbar-link');
+    if (!topbar) { return; }
+    topbar.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = getTopbarTarget();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initTopbarLink);
+</script>
+
 <meta name="keywords" content=" ">
 <!-- <meta http-equiv="Refresh" content="1800"> -->
 
@@ -49,7 +67,7 @@
 
 <table border="0" width="727" cellspacing="0" cellpadding="0">
 
-<tr><td colspan=13><img src="/src/topbar.jpg" width="727" height="93" border="0" usemap="#topbar_map"></td></tr>
+<tr><td colspan=13><a href="/index.html" id="topbar-link" style="display:block; line-height:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></a></td></tr>
 
 <!-- bread crumb stripe -->
 <tr>

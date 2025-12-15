@@ -1,5 +1,7 @@
 # Development files and backups
 dev/
+.cache/
+.venv/
 
 # Python cache
 __pycache__/

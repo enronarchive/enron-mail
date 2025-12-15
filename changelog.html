@@ -3,6 +3,23 @@
 <head>
     <title>Enron WebMail: Changelog</title>
     <LINK REL=stylesheet HREF="/src/mail.css" TYPE="text/css">
+    <script>
+    function getTopbarTarget() {
+        var mailbox = localStorage.getItem('enron_current_mailbox');
+        return mailbox ? '/mail/index.html' : '/index.html';
+    }
+
+    function initTopbarLink() {
+        var topbar = document.getElementById('topbar-link');
+        if (!topbar) { return; }
+        topbar.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = getTopbarTarget();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initTopbarLink);
+    </script>
 </head>
 
 <body bgcolor="#ffffff">
@@ -15,13 +32,13 @@
 
 <table border="0" width="727" cellspacing="0" cellpadding="0">
 
-<tr><td colspan=13><img src="/src/topbar.jpg" width="727" height="93" border="0"></td></tr>
+<tr><td colspan=13><a href="/index.html" id="topbar-link" style="display:block; line-height:0;"><img src="/src/topbar.jpg" width="727" height="93" border="0" style="display:block"></a></td></tr>
 
 <!-- bread crumb stripe -->
 <tr>
 	<td colspan=13 bgcolor="#0066cc">
 		<img src="/src/spacer.gif" width=10 height=1>
-		<b class="crumblink">You are here:</b>&nbsp;&nbsp;<nobr><a href="/dev/changelog/" class="crumblink">>>Website Changelog</a></nobr>
+		<b class="crumblink">You are here:</b>&nbsp;&nbsp;<nobr><a href="changelog.html" class="crumblink">>>Website Changelog</a></nobr>
 	</td>
 </tr>
 
@@ -69,6 +86,32 @@
 			<tr>
 				<td><img src="/src/spacer.gif" width=120 height=1></td>
 				<td>
+                    <!--START OF RELEASE-->
+                    <img src="/src/024.gif" width="363" height="1">
+                    <h3 align=center>Version 1.0.3</h3>
+                    <p align=center>Released on December 14th, 2025.</p>
+
+                    <b>ADDED</b>
+                    <p align=left>
+                    <li>Added a toggle to include calendar entries in the comprehensive search. Default behaviour is off.</li>
+                    <li>Clicking on the topbar now acts as a go to homepage button. For logged in users, this takes you to the </li>
+                    <li>Results in search page now have same pagination options as mailbox folders.</li>
+                        
+                    <b>FIXED</b>
+                    <p align=left>
+                    <li>Fixed perlingiere-d mailbox.</li>
+                    <li>Fixed go back button not going to the search page when coming from search.</li>
+                    <li>Checkmark indicators now match website styling in search page.</li>
+                    <li>Mailbox title now displays full name instead of truncated version.</li>
+
+                    <b>REMOVED</b>
+                    <p align=left>
+                    <li>Removed /mail/mailbox_viewer.html file that was old and not needed.</li>
+
+                    </p>
+                    <br>
+                    <!-- END OF RELEASE -->
+                    
                     <!--START OF RELEASE-->
                     <img src="/src/024.gif" width="363" height="1">
                     <h3 align=center>Version 1.0.1</h3>
