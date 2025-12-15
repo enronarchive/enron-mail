@@ -186,7 +186,10 @@ class MailboxApp {
             const urlParams = this.getUrlParams();
             
             // Find the first Inbox folder (or first available folder)
-            const folders = this.mailboxData.folders || [];
+            const foldersData = this.mailboxData.folders || {};
+            const folders = Array.isArray(foldersData) 
+                ? foldersData 
+                : Object.keys(foldersData).map(name => ({ name }));
             const inboxFolder = folders.find(f => f.name.includes('Inbox'));
             let defaultFolder = inboxFolder ? inboxFolder.name : (folders[0] ? folders[0].name : null);
             
@@ -311,7 +314,14 @@ class MailboxApp {
         const specialFoldersList = document.getElementById('special-folders-list');
         if (!folderList) return;
         
-        const folders = this.mailboxData.folders || [];
+        // Convert folders object to array format
+        const foldersData = this.mailboxData.folders || {};
+        const folders = Array.isArray(foldersData) 
+            ? foldersData 
+            : Object.entries(foldersData).map(([name, emailIds]) => ({
+                name,
+                count: Array.isArray(emailIds) ? emailIds.length : 0
+            }));
         
         // Identify special folders (Inbox, Sent Items, All Documents/All Mail)
         const specialFolderPatterns = ['inbox', 'sent items', 'sent', 'all documents', 'all mail', 'all items'];
@@ -483,7 +493,10 @@ class MailboxApp {
     
     loadInbox() {
         // Find the first Inbox folder
-        const folders = this.mailboxData.folders || [];
+        const foldersData = this.mailboxData.folders || {};
+        const folders = Array.isArray(foldersData) 
+            ? foldersData 
+            : Object.keys(foldersData).map(name => ({ name }));
         const inboxFolder = folders.find(f => f.name.includes('Inbox'));
         const folderToLoad = inboxFolder ? inboxFolder.name : (folders[0] ? folders[0].name : null);
         if (folderToLoad) {
