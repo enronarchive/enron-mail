@@ -923,11 +923,12 @@ class MailboxApp {
             const name = this.escapeHtml(filename);
             
             // Handle paths - attachments may be in batch folders now
-            // Original path like "attachments/file.ext" needs to check batch folders
+            // Path needs to be absolute from root: /mail/{mailbox}/attachments/...
             let path = '#';
             if (att.path) {
-                path = `${this.mailboxName}/${att.path}`;
-                // Note: The actual file may be in attachments/batch_XXX/ now
+                path = `/mail/${this.mailboxName}/${att.path}`;
+                // This will be redirected to HuggingFace by Netlify
+            }
                 // but the path in the JSON is still the original path
                 // The server/file system should handle this, or we need to update paths
                 // For now, keep original path structure
