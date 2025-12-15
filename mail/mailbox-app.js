@@ -929,10 +929,6 @@ class MailboxApp {
                 path = `/mail/${this.mailboxName}/${att.path}`;
                 // This will be redirected to HuggingFace by Netlify
             }
-                // but the path in the JSON is still the original path
-                // The server/file system should handle this, or we need to update paths
-                // For now, keep original path structure
-            }
             
             const icon = this.getAttachmentIcon(filename);
             
