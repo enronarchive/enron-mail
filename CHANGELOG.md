@@ -10,6 +10,7 @@
 - Added calendar function, that displays calendar events in an actual calendar, featuring monthly, weekly, daily and schedule views.
 - Added option on comprehensive search page to search for either emails or calendar entries, with their respective views.
 - Added changelog.md file.
+- Added option to cancel search.
 
 **FIXED**
 
@@ -18,7 +19,7 @@
 
 **REMOVED**
 
-- Removed /changelog.html file that was old and not needed.
+- Removed /changelog.html file.
 - Remove option to "include calendar entries" on search page.
 
 ---
