@@ -119,9 +119,26 @@
 	
 	/* Sidebar menu and folder styles */
 	.sidebar-content {
-		max-width: 180px;
+		width: 180px !important;
+		min-width: 180px !important;
+		max-width: 180px !important;
 		overflow: hidden;
 		word-wrap: break-word;
+		box-sizing: border-box;
+	}
+
+	td[bgcolor="#0066cc"][align="left"][width="180"] {
+		width: 180px !important;
+		min-width: 180px !important;
+		max-width: 180px !important;
+		box-sizing: border-box;
+	}
+
+	table[width="180"] {
+		width: 180px !important;
+		min-width: 180px !important;
+		max-width: 180px !important;
+		box-sizing: border-box;
 	}
 	.sidebar-menu {
 		margin-bottom: 15px;
@@ -459,12 +476,15 @@
 					<div id="email-list-container">
 						<div class="no-results">Loading emails...</div>
 					</div>
-					
+
+					<!-- Calendar container (hidden by default) -->
+					<div id="calendar-container" style="display:none;"></div>
+
 					<!-- Inline email detail view -->
 					<div id="email-detail">
 						<div id="email-detail-content"></div>
 					</div>
-					
+
 				<!-- Pagination -->
 				<div class="pagination" id="pagination" style="text-align:center;">
 					<!-- First row: Previous and Next buttons -->
@@ -513,7 +533,9 @@
 
 </div>
 
+
 <script src="mailbox-app.js?v=39"></script>
+<!-- calendar-app.js will be loaded dynamically when needed -->
 
 </body>
 </html>

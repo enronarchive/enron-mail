@@ -59,6 +59,24 @@
 		cursor: not-allowed;
 	}
 	
+	.cancel-button {
+		background-color: #ccc;
+		color: #333;
+		padding: 10px 30px;
+		border: none;
+		font-weight: bold;
+		cursor: pointer;
+		font-size: 12px;
+		margin-bottom: 15px;
+		width: 100%;
+		display: none;
+	}
+	
+	.cancel-button:hover {
+		background-color: #999;
+		color: white;
+	}
+	
 	.filter-group {
 		margin-bottom: 10px;
 		font-size: 11px;
@@ -304,7 +322,7 @@
 					<div class="filter-group">
 						<label>Mailboxes:</label>
 						<div class="mailbox-dropdown" id="mailboxDropdown" onclick="toggleMailboxList()">
-							<span class="loading-spinner"></span> Loading mailboxes...
+							150 mailboxes selected
 						</div>
 						<div id="mailboxCheckboxes" class="mailbox-checkboxes">
 							<a href="#" class="select-all-link" onclick="toggleAllMailboxes(); return false;">Select All / None</a>
@@ -327,13 +345,19 @@
 					</div>
 					
 					<div class="filter-group">
-						<label style="display: block; margin-bottom: 5px;">
-							<input type="checkbox" id="includeCalendar" style="width: auto; margin-right: 5px; accent-color: #ff9900;">
-							Include calendar entries
-						</label>
-					</div>
+							<label>Search Type:</label>
+							<label style="display: block; margin-bottom: 5px; cursor: pointer;">
+								<input type="radio" name="searchType" value="emails" checked style="width: auto; margin-right: 5px; accent-color: #ff9900;">
+								Emails
+							</label>
+							<label style="display: block; cursor: pointer;">
+								<input type="radio" name="searchType" value="calendar" style="width: auto; margin-right: 5px; accent-color: #ff9900;">
+								Calendar Entries
+							</label>
+						</div>
 					
 					<button class="search-button" onclick="performSearch()">Search</button>
+					<button class="cancel-button" id="cancelButton" onclick="cancelSearch()">Cancel Search</button>
 					</div>
 					
 				</td>
@@ -362,6 +386,9 @@
 					
 					<!-- Search Results -->
 					<div id="results"></div>
+					
+					<!-- Calendar View Container -->
+					<div id="calendar-container" style="display: none;"></div>
 					
 					<!-- Pagination -->
 					<div class="pagination" id="pagination" style="display: none;">
@@ -418,7 +445,29 @@
 </div> <!-- page-container -->
 
 <script>
-	let allMailboxes = [];
+	// Hardcoded list of all available mailboxes (fixed dataset)
+	let searchCancelled = false;
+	let allMailboxes = [
+		'allen-p', 'arnold-j', 'arora-h', 'badeer-r', 'bailey-s', 'bass-e', 'baughman-d', 'beck-s',
+		'benson-r', 'blair-l', 'brawner-s', 'buy-r', 'campbell-l', 'carson-m', 'cash-m', 'causholli-m',
+		'corman-s', 'crandall-s', 'cuilla-m', 'dasovich-j', 'davis-d', 'dean-c', 'dean-c2', 'delainey-d',
+		'derrick-j', 'dickson-s', 'donoho-l', 'donohoe-t', 'dorland-c', 'ermis-f', 'farmer-d', 'fischer-m',
+		'fischer-m2', 'forney-j', 'fossum-d', 'gang-l', 'gay-r', 'geaccone-t', 'germany-c', 'gilbertsmith-d',
+		'giron-d', 'griffith-j', 'grigsby-m', 'guzman-m', 'haedicke-m', 'hain-m', 'harris-s', 'hayslett-r',
+		'heard-m', 'hendrickson-s', 'hernandez-j', 'hodge-j', 'hodge-j2', 'holst-k', 'horton-s', 'hyatt-k',
+		'hyvl-d', 'jones-t', 'kaminski-v', 'kean-s', 'keavey-p', 'keiser-k', 'king-j', 'kitchen-l',
+		'kuykendall-t', 'lavorato-j', 'lay-k', 'lenhart-m', 'lewis-a', 'linder-e', 'lokay-m', 'lokey-t',
+		'love-p', 'lucci-p', 'maggi-m', 'mann-k', 'martin-t', 'may-l', 'mccarty-d', 'mcconnell-m',
+		'mckay-b', 'mckay-j', 'mclaughlin-e', 'merris-s', 'meyers-a', 'mims-p', 'motley-m', 'neal-s',
+		'nemec-g', 'panus-s', 'parks-j', 'pereira-s', 'perlingiere-d', 'pimenov-v', 'platter-p', 'presto-k',
+		'quenet-j', 'quigley-d', 'rapp-b', 'reitmeyer-j', 'richey-c', 'ring-a', 'ring-r', 'rodrigue-r',
+		'rogers-b', 'ruscitti-k', 'sager-e', 'saibi-e', 'salisbury-h', 'sanchez-m', 'sanders-r', 'scholtes-d',
+		'schoolcraft-d', 'schwieger-j', 'scott-s', 'semperger-c', 'shackleton-s', 'shankman-j', 'shapiro-r',
+		'shively-h', 'skilling-j', 'slinger-r', 'smith-m', 'solberg-g', 'south-s', 'staab-t', 'stclair-c',
+		'steffes-j', 'stepenovitch-j', 'stokley-c', 'storey-g', 'sturm-f', 'swerzbin-m', 'symes-k', 'taylor-m',
+		'tholt-j', 'thomas-p', 'townsend-j', 'tycholiz-b', 'ward-k', 'watson-k', 'weldon-c', 'whalley-g',
+		'white-s', 'whitt-m', 'williams-b', 'williams-j', 'wolfe-j', 'ybarbo-p', 'zipper-a', 'zufferli-j'
+	];
 	let searchResults = [];
 	let currentPage = 1;
 	const resultsPerPage = 50;
@@ -439,7 +488,7 @@
 			window.history.replaceState({}, document.title, url.pathname + url.search);
 		}
 		
-		await loadMailboxList();
+		initializeMailboxDropdown();
 		populateMailboxFilter();
 		
 		// Restore search parameters and re-run search if returning from email view
@@ -485,49 +534,10 @@
 		});
 	}
 
-	async function loadMailboxList() {
+	function initializeMailboxDropdown() {
 		const dropdown = document.getElementById('mailboxDropdown');
-		try {
-			console.log('Loading mailbox list from redirectLogic.js...');
-			const response = await fetch('redirectLogic.js');
-			console.log('redirectLogic.js response:', response.ok, response.status);
-			const text = await response.text();
-			console.log('redirectLogic.js text length:', text.length);
-			const match = text.match(/validMailboxes\s*=\s*\[([\s\S]*?)\]/);
-			console.log('Regex match found:', !!match);
-			if (match) {
-				const mailboxesText = match[1];
-				const allFromFile = mailboxesText
-					.split(',')
-					.map(m => m.trim().replace(/['"]/g, ''))
-					.filter(m => m);
-				console.log('Mailboxes from file:', allFromFile.length);
-				
-				dropdown.innerHTML = `<span class="loading-spinner"></span> Loading mailboxes (0/${allFromFile.length})...`;
-				
-				// Verify each mailbox exists by trying to fetch its index.json
-				for (let i = 0; i < allFromFile.length; i++) {
-					const mailbox = allFromFile[i];
-					try {
-						const testResponse = await fetch(`/mail/${mailbox}/index.json`, { method: 'HEAD' });
-						if (testResponse.ok) {
-							allMailboxes.push(mailbox);
-						}
-					} catch (e) {
-						// Skip mailboxes that don't exist
-					}
-					// Update progress every 10 mailboxes
-					if (i % 10 === 0 || i === allFromFile.length - 1) {
-						dropdown.innerHTML = `<span class="loading-spinner"></span> Loading mailboxes (${i + 1}/${allFromFile.length})...`;
-					}
-				}
-				console.log('Verified mailboxes:', allMailboxes.length);
-				dropdown.innerHTML = `${allMailboxes.length} mailboxes selected`;
-			}
-		} catch (error) {
-			console.error('Error loading mailbox list:', error);
-			dropdown.innerHTML = 'Error loading mailboxes';
-		}
+		dropdown.innerHTML = `${allMailboxes.length} mailboxes selected`;
+		console.log('Initialized with', allMailboxes.length, 'mailboxes (hardcoded list)');
 	}
 
 	function populateMailboxFilter() {
@@ -539,16 +549,27 @@
 			checkbox.value = mailbox;
 			checkbox.checked = true; // All checked by default
 			checkbox.className = 'mailbox-checkbox';
+			checkbox.addEventListener('change', updateMailboxCount);
 		label.appendChild(checkbox);
 		label.appendChild(document.createTextNode(` ${mailbox}`));
 		container.appendChild(label);
 	});
-}
+		updateMailboxCount();
+	}
+
+	function updateMailboxCount() {
+		const checkedCount = document.querySelectorAll('.mailbox-checkbox:checked').length;
+		const dropdown = document.getElementById('mailboxDropdown');
+		if (dropdown) {
+			dropdown.innerHTML = `${checkedCount} mailbox${checkedCount !== 1 ? 'es' : ''} selected`;
+		}
+	}
 
 	function toggleAllMailboxes() {
 		const checkboxes = document.querySelectorAll('.mailbox-checkbox');
 		const allChecked = Array.from(checkboxes).every(cb => cb.checked);
 		checkboxes.forEach(cb => cb.checked = !allChecked);
+		updateMailboxCount();
 	}
 	
 	function toggleMailboxList() {
@@ -577,7 +598,8 @@
 		}
 
 		const searchAttachments = document.getElementById('searchAttachments').checked;
-		const includeCalendar = document.getElementById('includeCalendar').checked;
+		const searchType = document.querySelector('input[name="searchType"]:checked').value;
+		const searchingCalendar = searchType === 'calendar';
 
 		// Reset to page 1
 		currentPage = 1;
@@ -592,18 +614,26 @@
 		document.getElementById('results').innerHTML = '';
 		
 		const searchBtn = document.querySelector('.search-button');
+		const cancelBtn = document.getElementById('cancelButton');
 		searchBtn.disabled = true;
+		searchBtn.style.display = 'none';
+		cancelBtn.style.display = 'block';
+		searchCancelled = false;
 
 		searchResults = [];
 		let searchedCount = 0;
 
 		try {
 			for (const mailbox of selectedMailboxes) {
+				if (searchCancelled) {
+					document.getElementById('statusText').textContent = 'Search cancelled.';
+					break;
+				}
 				searchedCount++;
 				document.getElementById('statusText').textContent = 
 					`Searching ${searchedCount} of ${selectedMailboxes.length} mailboxes...`;
 				
-			await searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments, includeCalendar);
+			await searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments, searchingCalendar);
 		}
 
 		// Save only search parameters to sessionStorage (not results - too large)
@@ -616,7 +646,11 @@
 		}));
 
 		// Display results
-		displayResults();
+		if (searchingCalendar) {
+			displayCalendarResults();
+		} else {
+			displayResults();
+		}
 		} catch (error) {
 			console.error('Search error:', error);
 		document.getElementById('results').innerHTML = 
@@ -624,10 +658,15 @@
 	} finally {
 		document.getElementById('loading').style.display = 'none';
 		searchBtn.disabled = false;
+		searchBtn.style.display = 'block';
+		cancelBtn.style.display = 'none';
 	}
 }
-
-async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments, includeCalendar) {
+	function cancelSearch() {
+		searchCancelled = true;
+		document.getElementById('statusText').textContent = 'Cancelling search...';
+	}
+	async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttachments, searchingCalendar) {
 		try {
 			const response = await fetch(`/mail/${mailbox}/index.json`);
 			if (!response.ok) return;
@@ -729,9 +768,14 @@ async function searchMailbox(mailbox, searchTerm, dateFrom, dateTo, searchAttach
 					if (dateTo && emailDate > new Date(dateTo + 'T23:59:59')) matches = false;
 				}
 
-			// Skip calendar folders if includeCalendar is false
-			if (matches && !includeCalendar && email.folder && email.folder.toLowerCase().includes('calendar')) {
-				matches = false;
+			// Filter based on search type
+			const isCalendarEntry = email.folder && email.folder.toLowerCase().includes('calendar');
+			if (searchingCalendar) {
+				// Only include calendar entries
+				if (!isCalendarEntry) matches = false;
+			} else {
+				// Exclude calendar entries when searching emails
+				if (isCalendarEntry) matches = false;
 			}
 
 			if (matches) {
@@ -779,12 +823,65 @@ function stripHtml(html) {
 		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	}
 
+	function displayCalendarResults() {
+		const resultsDiv = document.getElementById('results');
+		const calendarDiv = document.getElementById('calendar-container');
+		const paginationDiv = document.getElementById('pagination');
+		
+		// Hide email results, show calendar
+		resultsDiv.style.display = 'none';
+		calendarDiv.style.display = 'block';
+		paginationDiv.style.display = 'none';
+		
+		document.getElementById('statusText').textContent = 
+			`Found ${searchResults.length} calendar entr${searchResults.length !== 1 ? 'ies' : 'y'}`;
+		
+		if (searchResults.length === 0) {
+			calendarDiv.innerHTML = `
+				<div class="no-results">
+					<div style="font-weight: bold; margin-bottom: 5px;">No calendar entries found</div>
+					<div>Try different search terms or filters</div>
+				</div>
+			`;
+			return;
+		}
+		
+		// Convert search results to calendar event format
+		const calendarEvents = searchResults.map(result => ({
+			...result,
+			start: result.date,
+			end: result.endDate || null,
+			subject: result.subject || 'Calendar Entry'
+		}));
+		
+		// Load calendar-app.js if not loaded
+		if (typeof CalendarApp === 'undefined') {
+			// Check if script is already being loaded
+			const existingScript = document.querySelector('script[src*="calendar-app.js"]');
+			if (!existingScript) {
+				const script = document.createElement('script');
+				script.src = '/mail/calendar-app.js';
+				script.onload = () => { 
+					new CalendarApp(calendarEvents);
+				};
+				document.body.appendChild(script);
+			}
+		} else {
+			new CalendarApp(calendarEvents);
+		}
+	}
+
 	function displayResults() {
 		const resultsDiv = document.getElementById('results');
+		const calendarDiv = document.getElementById('calendar-container');
 		const paginationDiv = document.getElementById('pagination');
 		const pageInfoEl = document.getElementById('page-info');
 		const pageJumpInput = document.getElementById('page-jump');
 		const searchTerm = document.getElementById('searchInput').value.trim();
+		
+		// Show email results, hide calendar
+		resultsDiv.style.display = 'block';
+		calendarDiv.style.display = 'none';
 		
 		document.getElementById('statusText').textContent = 
 			`Found ${searchResults.length} result${searchResults.length !== 1 ? 's' : ''}`;

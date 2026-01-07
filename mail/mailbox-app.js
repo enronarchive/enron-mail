@@ -14,19 +14,22 @@ class MailboxApp {
         this.mailboxName = this.getCurrentMailbox();
         this.folderCache = new Map(); // Cache filtered emails per folder
         this.loadingProgress = { current: 0, total: 0 }; // Track loading progress
-        
+
         // LocalStorage state management
         this.readEmails = this.loadReadEmails();
         this.starredEmails = this.loadStarredEmails();
-        
+
         // Search debouncing
         this.searchDebounceTimer = null;
         this.SEARCH_DEBOUNCE_MS = 300;
-        
+
         // Sorting
         this.currentSort = { field: 'date', direction: 'desc' }; // date, from, subject
         this.folderSearchTerm = '';
         this.showAllFolders = false;
+
+        // Calendar events cache
+        this.calendarEvents = null;
     }
     
     loadReadEmails() {
@@ -394,13 +397,12 @@ class MailboxApp {
         const specialFolders = [];
         const regularFolders = [];
         const seenSpecialTypes = new Set();
-        
+
         folders.forEach(f => {
             const lowerName = f.name.toLowerCase();
             const matchedPattern = specialFolderPatterns.find(pattern => 
                 lowerName === pattern || lowerName.endsWith('/' + pattern)
             );
-            
             if (matchedPattern) {
                 // Only add first occurrence of each special folder type
                 if (!seenSpecialTypes.has(matchedPattern)) {
@@ -409,28 +411,37 @@ class MailboxApp {
                 } else {
                     regularFolders.push(f);
                 }
+            } else if (lowerName === 'calendar' || lowerName.endsWith('/calendar')) {
+                // Do not add user's calendar folders to regular folders
+                // We'll add a synthetic Calendar folder below
             } else {
                 regularFolders.push(f);
             }
+        });
+
+        // Add synthetic Calendar folder to special folders
+        specialFolders.push({
+            name: '__CALENDAR__',
+            count: this.getCalendarEvents().length
         });
         
         // Render special folders (always visible, not filtered)
         if (specialFoldersList) {
             let specialHtml = '';
-            
-            // Sort special folders: Inbox, Sent Items, All Mail
+            // Sort special folders: Inbox, Sent Items, All Mail, Calendar last
             specialFolders.sort((a, b) => {
+                if (a.name === '__CALENDAR__') return 1;
+                if (b.name === '__CALENDAR__') return -1;
                 if (a.name.includes('Inbox')) return -1;
                 if (b.name.includes('Inbox')) return 1;
                 if (a.name.includes('Sent')) return -1;
                 if (b.name.includes('Sent')) return 1;
                 return 0;
             });
-            
             for (const folder of specialFolders) {
-                const active = folder.name === this.currentFolder ? 'active' : '';
-                const displayName = this.formatFolderName(folder.name);
-                
+                const isCalendar = folder.name === '__CALENDAR__';
+                const active = (isCalendar && this.currentFolder === '__CALENDAR__') || (!isCalendar && folder.name === this.currentFolder) ? 'active' : '';
+                const displayName = isCalendar ? 'Calendar' : this.formatFolderName(folder.name);
                 specialHtml += `
                     <div class="folder-item ${active}" data-folder="${this.escapeHtml(folder.name)}">
                         <span class="folder-name">${displayName}</span>
@@ -438,16 +449,18 @@ class MailboxApp {
                     </div>
                 `;
             }
-            
             specialFoldersList.innerHTML = specialHtml;
-            
             // Add click handlers to special folder items
             document.querySelectorAll('#special-folders-list .folder-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     const folderName = e.currentTarget.getAttribute('data-folder');
-                    this.loadFolder(folderName);
+                    if (folderName === '__CALENDAR__') {
+                        this.loadCalendarFolder();
+                    } else {
+                        this.loadFolder(folderName);
+                    }
                     return false;
                 });
             });
@@ -543,19 +556,25 @@ class MailboxApp {
         if (searchBox) {
             searchBox.value = '';
         }
-        
+
         // Update URL with folder parameter
         this.updateUrl({ folder: folderName, email: null });
-        
+
         // Hide email detail if showing
         this.closeEmailDetail();
-        
+
         // Update active folder in UI
         this.renderFolders();
-        
+
+        // If switching to calendar folder, do not render email list
+        if (folderName === '__CALENDAR__') {
+            this.loadCalendarFolder();
+            return;
+        }
+
         // Filter emails for this folder
         this.filterEmails();
-        
+
         // Render email list
         this.renderEmailList();
     }
@@ -579,17 +598,22 @@ class MailboxApp {
             this.filteredEmails = this.folderCache.get(this.currentFolder);
             return;
         }
-        
-        // Filter emails by folder property
-        let emails = this.mailboxData.emails.filter(email => 
-            email.folder === this.currentFolder
-        );
-        
+
+        // Special handling for Calendar folder
+        if (this.currentFolder === '__CALENDAR__') {
+            this.filteredEmails = [];
+            return;
+        }
+        // Filter emails by folder property, EXCLUDE calendar events from all except calendar
+        let emails = this.mailboxData.emails.filter(email => {
+            const folder = (email.folder || '').toLowerCase();
+            if (folder === 'calendar' || folder.endsWith('/calendar')) return false;
+            return email.folder === this.currentFolder;
+        });
         // Cache the folder results if no search term
         if (!this.searchTerm) {
             this.folderCache.set(this.currentFolder, emails);
         }
-        
         // Apply search filter if present
         if (this.searchTerm) {
             const term = this.searchTerm.toLowerCase();
@@ -605,11 +629,111 @@ class MailboxApp {
                 );
             });
         }
-        
         this.filteredEmails = emails;
-        
         // Apply sorting
         this.sortEmails();
+    }
+
+    // Get all calendar events (from all folders named 'calendar')
+    getCalendarEvents() {
+        if (this.calendarEvents) return this.calendarEvents;
+        if (!this.mailboxData || !Array.isArray(this.mailboxData.emails)) return [];
+        
+        // Filter calendar emails
+        const calendarEmails = this.mailboxData.emails.filter(email => {
+            const folder = (email.folder || '').toLowerCase();
+            return folder === 'calendar' || folder.endsWith('/calendar');
+        });
+        
+        // Comprehensive deduplication using multiple fields
+        const seen = new Map();
+        const deduplicated = [];
+        
+        calendarEmails.forEach(email => {
+            // Filter out meaningless entries (just asterisks, empty, or whitespace)
+            const subject = (email.subject || '').trim();
+            if (!subject || /^[\*\s]+$/.test(subject) || subject === '(No Subject)') {
+                return;
+            }
+            
+            // Create a comprehensive unique key
+            const date = new Date(email.date);
+            const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}`;
+            const subjectLower = subject.toLowerCase();
+            const from = email.from ? `${email.from.name}-${email.from.email}`.toLowerCase() : '';
+            const bodySnippet = email.body ? email.body.substring(0, 100).replace(/\s+/g, ' ').trim().toLowerCase() : '';
+            
+            // Combine multiple fields for a robust unique key
+            const key = `${dateKey}|${subjectLower}|${from}|${bodySnippet}`;
+            
+            if (!seen.has(key)) {
+                seen.set(key, true);
+                deduplicated.push(email);
+            }
+        });
+        
+        // Map to event format
+        this.calendarEvents = deduplicated.map(email => ({
+            ...email,
+            start: email.date,
+            end: email.endDate || null
+        }));
+        
+        if (calendarEmails.length !== this.calendarEvents.length) {
+            console.log(`Calendar: Deduplicated ${calendarEmails.length} entries to ${this.calendarEvents.length} unique events`);
+        }
+        
+        return this.calendarEvents;
+    }
+
+    // Load the special calendar folder view
+    loadCalendarFolder() {
+        this.currentFolder = '__CALENDAR__';
+        this.currentPage = 1;
+        this.searchTerm = '';
+        const searchBox = document.getElementById('search-box');
+        if (searchBox) searchBox.value = '';
+        this.updateUrl({ folder: '__CALENDAR__', email: null });
+        this.closeEmailDetail();
+        this.renderFolders();
+        // Hide and clear email list and pagination, show calendar
+        const emailList = document.getElementById('email-list-container');
+        const pagination = document.getElementById('pagination');
+        const emailDetail = document.getElementById('email-detail');
+        if (emailList) {
+            emailList.style.display = 'none';
+            emailList.innerHTML = '';
+        }
+        if (pagination) pagination.style.display = 'none';
+        if (emailDetail) emailDetail.style.display = 'none';
+        let calDiv = document.getElementById('calendar-container');
+        if (calDiv) {
+            calDiv.style.display = 'block';
+        }
+
+        // Hide calendar when leaving calendar view (restore email list)
+        // Patch: when switching folders, show email list and hide calendar
+        const self = this;
+        const origLoadFolder = this.loadFolder;
+        this.loadFolder = function(folderName) {
+            if (emailList) emailList.style.display = '';
+            if (calDiv) calDiv.style.display = 'none';
+            if (pagination) pagination.style.display = '';
+            return origLoadFolder.call(self, folderName);
+        };
+        // Load calendar-app.js if not loaded
+        if (typeof CalendarApp === 'undefined') {
+            // Check if script is already being loaded
+            const existingScript = document.querySelector('script[src*="calendar-app.js"]');
+            if (!existingScript) {
+                const script = document.createElement('script');
+                script.src = 'calendar-app.js';
+                script.onload = () => { new CalendarApp(this.getCalendarEvents()); };
+                document.body.appendChild(script);
+            }
+        } else {
+            new CalendarApp(this.getCalendarEvents());
+        }
     }
     
     sortEmails() {
