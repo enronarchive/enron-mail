@@ -15,5 +15,8 @@ __pycache__/
 *.swo
 *~
 
-# Email attachments (stored in HuggingFace dataset)
-mail/*/attachments/
+# Mailbox dataset payload (served from HuggingFace dataset)
+mail/*
+!mail/index.html
+!mail/mailbox-app.js
+!mail/calendar-app.js

@@ -1,18 +1,18 @@
 
 # Enron Email
 
-An accessible and organized copy of the Enron Email dataset. Part of the **Enron Archive**.
+An app-first viewer for the Enron Email dataset. Part of the **Enron Archive**.
 
 A live mirror is available at https://mail.enroncorp.com
 
 ## Features
 
 ### Core Functionality
-- **151 employee mailboxes** with complete email history and attachments
+- **151 employee mailboxes** browsed from a remote dataset backend
 - **Pseudo-login system** - Browse any account; stays logged in until logged off
 - **Folder navigation** - Inbox, Sent Items, and custom folders per user
 - **Full email viewing** - Read complete emails with headers, body, and attachments
-- **Attachment support** - Download original files from emails
+- **Attachment support** - Download original files from emails (served from Hugging Face dataset)
 - **Authentic design** - Matched to Enron's internet presence in mid-2001
 - **Static website** - Pure HTML, CSS, and JavaScript (no server required)
 
@@ -62,12 +62,8 @@ A live mirror is available at https://mail.enroncorp.com
 ```
 mail/
 ├── mailbox-app.js          # Main application logic
+├── calendar-app.js         # Calendar and calendar-search integration
 ├── index.html              # Mailbox viewer interface
-├── mailbox-viewer.html     # Email detail view
-└── [user-folders]/         # 151 user mailbox directories
-    ├── mailbox.json        # Email metadata and folder structure
-    ├── mailbox_part_*.json # Split files for large mailboxes (>50MB)
-    └── attachments/        # Email attachments (organized by email ID)
 
 src/
 ├── mail.css                # Mailbox styling
@@ -77,6 +73,13 @@ index.html                  # Login page
 search.html                # Comprehensive search page
 legal.html                 # Legal notices
 ```
+
+## Data Source Architecture
+
+- Mailbox JSON index files and split parts are fetched via `/mail/:mailbox/index*.json` and redirected at the CDN layer to:
+  - `https://huggingface.co/datasets/enronarchive/mail`
+- Attachment file requests under `/mail/:mailbox/attachments/*` are also redirected to the same dataset.
+- This repository is now focused on viewer app code and static assets, while mailbox payload data is hosted externally.
 
 ## Getting Started
 

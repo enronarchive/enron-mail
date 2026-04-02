@@ -2,6 +2,21 @@
 
 ---
 
+### Version 1.1.1
+*Released on April 2nd, 2026.*
+
+**CHANGED**
+
+- Mailbox JSON payload requests now redirect to the Hugging Face dataset, matching attachment delivery.
+- Cache policy for mailbox index JSON files is now aggressive (`max-age=31536000, immutable`) to reduce repeated transfer load.
+- Repository scope is now app-first: viewer code and assets remain in-repo, while mailbox payload data is served externally.
+
+**REMOVED**
+
+- Tracked mailbox dataset files under `/mail/<mailbox>/` are no longer kept in this repository.
+
+---
+
 ### Version 1.1
 *Released on January 7th, 2026.*
 
