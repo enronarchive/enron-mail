@@ -2,7 +2,7 @@
 
 ---
 
-### Version 1.1.1
+### Version 1.2
 *Released on April 2nd, 2026.*
 
 **CHANGED**
